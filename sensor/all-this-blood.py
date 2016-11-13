@@ -64,14 +64,6 @@ async def life(websocket, path):
 
 
 if __name__ == '__main__':
-    # Config GPIO
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setwarnings(False)
-    GPIO.setup(SPIMOSI, GPIO.OUT)
-    GPIO.setup(SPIMISO, GPIO.IN)
-    GPIO.setup(SPICLK, GPIO.OUT)
-    GPIO.setup(SPICS, GPIO.OUT)
-
     loop = asyncio.get_event_loop()
     for interface in sys.argv[1:]:
         ip = netifaces.ifaddresses(interface)[2][0]['addr']
