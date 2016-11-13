@@ -8,7 +8,7 @@ This repo contains the source code used in [my project using a heartbeat sensor 
 ## Sensor
 This Python script collects heartbeat data from a [Pulse Sensor][pulse], sending heartbeat events over a websocket to the VR headset. It targets a Raspberry Pi that is using a MCP3008 analog to digital converter for the Pulse Sensor.
 
-The code requires Python 3.5+, and the [RPi.GPIO](https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008) and [webksockets](https://pypi.python.org/pypi/websockets) libraries.
+The code requires Python 3.5+, and the [RPi.GPIO](https://learn.adafruit.com/raspberry-pi-analog-to-digital-converters/mcp3008), [netifaces](https://pypi.python.org/pypi/netifaces), and [webksockets](https://pypi.python.org/pypi/websockets) libraries.
 
 To start it, simply run:
 
