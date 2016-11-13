@@ -20,7 +20,7 @@ from datetime import datetime
 
 EPOCH = datetime.utcfromtimestamp(0)
 
-SAMPLE_INTERVAL = 0.002 # sec
+SAMPLE_INTERVAL = 0.1 # sec
 
 WEBSOCKET_PORT = 5678 
 
@@ -41,7 +41,12 @@ class IfIOnly():
         pass
 
     def _sample(self):
-        return readadc(pulse_adc, SPICLK, SPIMOSI, SPIMISO, SPICS)
+        values = [0]*8
+
+        for i in range(8):
+            # The read_adc function will get the value of the specified channel (0-7).
+            values[i] = mcp.read_adc(i)
+        return faluse
 
     def beat(self):
         """Sample from sensor and update internal state"""
@@ -64,6 +69,11 @@ async def life(websocket, path):
 
 
 if __name__ == '__main__':
+    heart = IfIOnly()
+    while True:
+        print(heart.beat())
+        time.sleep(SAMPLE_INTERVAL)
+
     loop = asyncio.get_event_loop()
     for interface in sys.argv[1:]:
         ip = netifaces.ifaddresses(interface)[2][0]['addr']
