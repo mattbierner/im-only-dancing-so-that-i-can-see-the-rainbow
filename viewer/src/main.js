@@ -21,6 +21,7 @@ const renderer = new Renderer(
 const sound = new PulseSound()
 
 createPulseClient((data) => {
+    console.log(data);
     renderer.pulse(data)
     sound.play()
 })

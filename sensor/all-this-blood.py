@@ -71,7 +71,7 @@ async def life(websocket, path):
         while True:
             result = heart.beat()
             if result:
-                print("Beat {0}".format(result['bpm']))
+                print(result)
                 await websocket.send(json.dumps(result))
             await asyncio.sleep(SAMPLE_INTERVAL)
     finally:
@@ -80,10 +80,6 @@ async def life(websocket, path):
 
 if __name__ == '__main__':
     heart = Collector()
-    while True:
-        print(heart.beat())
-        time.sleep(SAMPLE_INTERVAL)
-
     loop = asyncio.get_event_loop()
     for interface in sys.argv[1:]:
         ip = netifaces.ifaddresses(interface)[2][0]['addr']

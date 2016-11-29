@@ -50,15 +50,15 @@
 
 	var _renderer2 = _interopRequireDefault(_renderer);
 
-	var _audio_context = __webpack_require__(7);
+	var _audio_context = __webpack_require__(4);
 
 	var audio_context = _interopRequireWildcard(_audio_context);
 
-	var _pulse_client = __webpack_require__(8);
+	var _pulse_client = __webpack_require__(5);
 
-	var _config = __webpack_require__(5);
+	var _config = __webpack_require__(6);
 
-	var _pulse_sound = __webpack_require__(9);
+	var _pulse_sound = __webpack_require__(7);
 
 	var _pulse_sound2 = _interopRequireDefault(_pulse_sound);
 
@@ -85,6 +85,7 @@
 	var sound = new _pulse_sound2.default();
 
 	(0, _pulse_client.createPulseClient)(function (data) {
+	    console.log(data);
 	    renderer.pulse(data);
 	    sound.play();
 	});
@@ -3574,28 +3575,7 @@
 	};
 
 /***/ },
-/* 4 */,
-/* 5 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/**
-	 * Hostname of Raspberry Pi streaming server.
-	 */
-	var ip = exports.ip = window.location.href.indexOf('eth') >= 0 ? '192.168.1.2' : '172.20.10.3';
-
-	/**
-	 * Offset in ms of when heartbeat occured and when the pi detected it
-	 */
-	var beatoffset = exports.beatoffset = -75;
-
-/***/ },
-/* 6 */,
-/* 7 */
+/* 4 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3629,7 +3609,7 @@
 	};
 
 /***/ },
-/* 8 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3639,7 +3619,7 @@
 	});
 	exports.createPulseClient = undefined;
 
-	var _config = __webpack_require__(5);
+	var _config = __webpack_require__(6);
 
 	/**
 	 * 
@@ -3648,20 +3628,32 @@
 	    var ws = new WebSocket('ws://' + _config.ip + ':5678/');
 	    ws.onmessage = function (event) {
 	        var data = JSON.parse(event.data);
-
-	        var now = Date.now();
-	        var expectedNextbeat = 1 / data.bpm * 60 * 1000;
-	        var time = Math.max(expectedNextbeat - (now - data.time - _config.beatoffset), 0);
-
-	        setTimeout(function () {
-	            handler(data);
-	        }, time);
+	        handler(data);
 	    };
 	    return ws;
 	};
 
 /***/ },
-/* 9 */
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/**
+	 * Hostname of Raspberry Pi streaming server.
+	 */
+	var ip = exports.ip = 'challah.local';
+
+	/**
+	 * Offset in ms of when heartbeat occured and when the pi detected it
+	 */
+	var beatoffset = exports.beatoffset = -75;
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3672,7 +3664,7 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _audio_context = __webpack_require__(7);
+	var _audio_context = __webpack_require__(4);
 
 	var _audio_context2 = _interopRequireDefault(_audio_context);
 
