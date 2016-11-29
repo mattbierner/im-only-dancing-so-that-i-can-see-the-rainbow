@@ -20,7 +20,7 @@ from datetime import datetime
 
 EPOCH = datetime.utcfromtimestamp(0)
 
-SAMPLE_INTERVAL = 0.1 # sec
+SAMPLE_INTERVAL = 0.05 # sec
 
 WEBSOCKET_PORT = 5678 
 
@@ -32,31 +32,41 @@ MOSI = 24
 CS = 25
 mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
 
+# Conf
+LEFT = {
+    "channel": 0,
+    "x": 0,
+    "y": 1,
+    "z": 2 
+}
+
 
 def readadc(pin):
     return mcp.read_adc(pin)
 
-class IfIOnly():
+class Collector():
     def __init__(self):
         pass
 
     def _sample(self):
-        values = [0]*8
+        return {
+            "left": self._sampleUnit(LEFT)
+        }
 
-        for i in range(8):
-            # The read_adc function will get the value of the specified channel (0-7).
-            values[i] = mcp.read_adc(i)
-        return faluse
+    def _sampleUnit(self, unit):
+        return {
+            "x": mcp.read_adc(unit["x"]),
+            "y": mcp.read_adc(unit["z"]),
+            "z": mcp.read_adc(unit["z"])
+        }
 
     def beat(self):
         """Sample from sensor and update internal state"""
-        should_return = False
-        signal = self._sample()
-        print(signal)
+        return self._sample()
 
 async def life(websocket, path):
     """Websocket handler"""
-    heart = IfIOnly()
+    heart = Collector()
     try:
         while True:
             result = heart.beat()
@@ -69,7 +79,7 @@ async def life(websocket, path):
 
 
 if __name__ == '__main__':
-    heart = IfIOnly()
+    heart = Collector()
     while True:
         print(heart.beat())
         time.sleep(SAMPLE_INTERVAL)
