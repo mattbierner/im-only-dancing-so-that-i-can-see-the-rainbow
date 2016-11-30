@@ -14,7 +14,6 @@ import os
 import json
 import websockets
 import netifaces
-import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
 from datetime import datetime
 
@@ -40,6 +39,13 @@ LEFT = {
     "z": 2 
 }
 
+RIGHT = {
+    "channel": 0,
+    "x": 5,
+    "y": 6,
+    "z": 7 
+}
+
 
 def readadc(pin):
     return mcp.read_adc(pin)
@@ -50,7 +56,8 @@ class Collector():
 
     def _sample(self):
         return {
-            "left": self._sampleUnit(LEFT)
+            "left": self._sampleUnit(LEFT),
+            "right": self._sampleUnit(RIGHT)
         }
 
     def _sampleUnit(self, unit):
@@ -63,6 +70,7 @@ class Collector():
     def beat(self):
         """Sample from sensor and update internal state"""
         return self._sample()
+
 
 async def life(websocket, path):
     """Websocket handler"""
