@@ -1,12 +1,4 @@
 #!/usr/bin/env python
-# Simple websocket server that emits 
-#
-# M3008 reading logic from Adafruit
-# --------
-# Written by Limor "Ladyada" Fried for Adafruit Industries, (c) 2015
-# This code is released into the public domain
-# --------
-#
 import sys
 import time
 import asyncio
@@ -19,9 +11,9 @@ from datetime import datetime
 
 EPOCH = datetime.utcfromtimestamp(0)
 
-SAMPLE_INTERVAL = 0.05 # sec
+SAMPLE_INTERVAL = 0.05  # sec
 
-WEBSOCKET_PORT = 5678 
+WEBSOCKET_PORT = 5678
 
 # GPIO config
 pulse_adc = 0
@@ -36,21 +28,23 @@ LEFT = {
     "channel": 0,
     "x": 0,
     "y": 1,
-    "z": 2 
+    "z": 2
 }
 
 RIGHT = {
     "channel": 0,
     "x": 5,
     "y": 6,
-    "z": 7 
+    "z": 7
 }
 
 
 def readadc(pin):
     return mcp.read_adc(pin)
 
+
 class Collector():
+
     def __init__(self):
         pass
 
@@ -95,4 +89,3 @@ if __name__ == '__main__':
         loop.run_until_complete(start_server)
 
     loop.run_forever()
-

@@ -23,6 +23,10 @@ export default class Renderer {
             left: {
                 last: new THREE.Vector3(0.5, 0.5, 0.5),
                 d: 0
+            },
+            right: {
+                last: new THREE.Vector3(0.5, 0.5, 0.5),
+                d: 0
             }
         }
 
@@ -37,7 +41,7 @@ export default class Renderer {
     pulse(data) {
         this._lastMs = this._clock.getElapsedTime() * 1000
 
-        for (const channel of ['left']) {
+        for (const channel of ['left', 'right']) {
             const current = new THREE.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax)
             const d = new THREE.Vector3().subVectors(current, this._state[channel].last)
 
@@ -115,8 +119,7 @@ export default class Renderer {
         this._map.needsUpdate = true
         this._material.needsUpdate = true
 
-    
-
+        this._material.uniforms.weights.value.x = this._state.right.d
         this._material.uniforms.weights.value.z = this._state.left.d
         this._material.uniforms.weights.needsUpdate = true
 

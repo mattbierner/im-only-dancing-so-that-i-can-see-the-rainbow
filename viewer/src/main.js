@@ -1,7 +1,7 @@
 import Renderer from './renderer'
 import * as audio_context from './audio_context'
 import {createPulseClient} from './pulse_client'
-import {ip} from './config'
+import {viewerIp} from './config'
 import PulseSound from './pulse_sound'
 
 const onIos = () =>
@@ -32,4 +32,4 @@ img.onload = () => {
     renderer.setImage(img)
     renderer.animate()
 }
-img.src = "http://localhost:8000/image.jpg" //`http://${ip}:8080/?action=stream_0`
+img.src = `http://${viewerIp}:1234/?action=stream_0`

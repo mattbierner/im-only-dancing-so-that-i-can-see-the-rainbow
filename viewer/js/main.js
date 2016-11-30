@@ -96,7 +96,7 @@
 	    renderer.setImage(img);
 	    renderer.animate();
 	};
-	img.src = "http://localhost:8000/image.jpg"; //`http://${ip}:8080/?action=stream_0`
+	img.src = 'http://' + _config.viewerIp + ':1234/?action=stream_0';
 
 /***/ },
 /* 1 */
@@ -150,6 +150,10 @@
 	            left: {
 	                last: new _three2.default.Vector3(0.5, 0.5, 0.5),
 	                d: 0
+	            },
+	            right: {
+	                last: new _three2.default.Vector3(0.5, 0.5, 0.5),
+	                d: 0
 	            }
 	        };
 
@@ -168,7 +172,7 @@
 	        value: function pulse(data) {
 	            this._lastMs = this._clock.getElapsedTime() * 1000;
 
-	            var _arr = ['left'];
+	            var _arr = ['left', 'right'];
 	            for (var _i = 0; _i < _arr.length; _i++) {
 	                var channel = _arr[_i];
 	                var current = new _three2.default.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax);
@@ -260,6 +264,7 @@
 	            this._map.needsUpdate = true;
 	            this._material.needsUpdate = true;
 
+	            this._material.uniforms.weights.value.x = this._state.right.d;
 	            this._material.uniforms.weights.value.z = this._state.left.d;
 	            this._material.uniforms.weights.needsUpdate = true;
 
@@ -3664,6 +3669,8 @@
 	 * Hostname of Raspberry Pi streaming server.
 	 */
 	var ip = exports.ip = 'challah.local';
+
+	var viewerIp = exports.viewerIp = 'sourdough.local';
 
 	/**
 	 * Offset in ms of when heartbeat occured and when the pi detected it
