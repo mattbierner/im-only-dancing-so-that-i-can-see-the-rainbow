@@ -63,7 +63,7 @@ class Collector():
     def _sampleUnit(self, unit):
         return {
             "x": mcp.read_adc(unit["x"]),
-            "y": mcp.read_adc(unit["z"]),
+            "y": mcp.read_adc(unit["y"]),
             "z": mcp.read_adc(unit["z"])
         }
 
