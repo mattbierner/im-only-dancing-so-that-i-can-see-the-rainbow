@@ -82,12 +82,12 @@
 
 	var renderer = new _renderer2.default(document.getElementById('canvas3d'), document.getElementById('main'));
 
-	var sound = new _pulse_sound2.default();
+	//const sound = new PulseSound()
 
 	(0, _pulse_client.createPulseClient)(function (data) {
-	    console.log(data);
+	    //  console.log(data);
 	    renderer.pulse(data);
-	    sound.play();
+	    //sound.play()
 	});
 
 	var img = new Image();
@@ -96,7 +96,7 @@
 	    renderer.setImage(img);
 	    renderer.animate();
 	};
-	img.src = 'http://' + _config.ip + ':8080/?action=stream_0';
+	img.src = "http://localhost:8000/image.jpg"; //`http://${ip}:8080/?action=stream_0`
 
 /***/ },
 /* 1 */
@@ -114,17 +114,20 @@
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _beat_show = __webpack_require__(3);
+	var _vignette_red = __webpack_require__(3);
 
-	var _beat_show2 = _interopRequireDefault(_beat_show);
+	var _vignette_red2 = _interopRequireDefault(_vignette_red);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	///vignette_red'//beat_show'
+	//beat_show'
+
+	var sampleMax = 1024;
 
 	var canvas2d = document.getElementById('canvas2d');
+	var decay = 0.9;
 
 	var nearestPowerOfTwo = function nearestPowerOfTwo(dim) {
 	    var power = 2;
@@ -142,7 +145,13 @@
 	        this._container = container;
 	        this._clock = new _three2.default.Clock();
 	        this._lastMs = 0;
-	        this._bpm = 60;
+
+	        this._state = {
+	            left: {
+	                last: new _three2.default.Vector3(0.5, 0.5, 0.5),
+	                d: 0
+	            }
+	        };
 
 	        this._scene = new _three2.default.Scene();
 
@@ -158,7 +167,19 @@
 	        key: 'pulse',
 	        value: function pulse(data) {
 	            this._lastMs = this._clock.getElapsedTime() * 1000;
-	            this._bpm = data.bpm;
+
+	            var _arr = ['left'];
+	            for (var _i = 0; _i < _arr.length; _i++) {
+	                var channel = _arr[_i];
+	                var current = new _three2.default.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax);
+	                var d = new _three2.default.Vector3().subVectors(current, this._state[channel].last);
+
+	                this._state[channel].d += (d.length() || 0) * 2;
+	                this._state[channel].d *= decay;
+	                this._state[channel].d = Math.max(0, this._state[channel].d);
+
+	                this._state[channel].last = current;
+	            }
 	        }
 	    }, {
 	        key: 'setImage',
@@ -199,7 +220,7 @@
 	        value: function _initMaterials() {
 	            this._map = new _three2.default.Texture(this._canvas2d);
 
-	            this._material = new _three2.default.ShaderMaterial(_beat_show2.default);
+	            this._material = new _three2.default.ShaderMaterial(_vignette_red2.default);
 	            this._material.uniforms.map.value = this._map;
 	            this._material.uniforms.map.needsUpdate = true;
 	        }
@@ -239,11 +260,8 @@
 	            this._map.needsUpdate = true;
 	            this._material.needsUpdate = true;
 
-	            var msBetweenBeats = 1 / this._bpm * 60.0 * 1000;
-	            var val = 1 - (startMs - this._lastMs) / msBetweenBeats;
-	            var progress = Math.min(Math.max(val, 0), 1);
-	            this._material.uniforms.progress.value = progress;
-	            this._material.uniforms.progress.needsUpdate = true;
+	            this._material.uniforms.weights.value.z = this._state.left.d;
+	            this._material.uniforms.weights.needsUpdate = true;
 
 	            this._render();
 	        }
@@ -3563,15 +3581,15 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	/**
-	 * Shows the world on each beat
+	 * Draws a red vignette on each beat.
 	 */
 	exports.default = {
 	    uniforms: {
 	        map: { type: 't', value: new _three2.default.Texture() },
-	        progress: { value: 0.0 }
+	        weights: { type: 'v3', value: new _three2.default.Vector3(0, 0, 0) }
 	    },
 	    vertexShader: '\n        varying vec2 vUv;\n        \n        void main() {\n            vUv = uv;\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n        }\n    ',
-	    fragmentShader: '\n        uniform sampler2D map;\n        uniform float progress;\n\n        varying vec2 vUv;\n        \n        const float radius = 0.0;\n        const float softness = 0.5;\n\n        void main() {\n            vec4 tex = texture2D(map, vUv);\n\n            // vignette\n            vec2 position = vUv - vec2(0.5);\n            float len = length(position);\n            float vignette = 1.0 - smoothstep(radius, radius - softness, len);\n            tex.rgb = mix(tex.rgb, vec3(0.0, 0.0, 0.0), (1.0 - progress) * vignette);\n\n            gl_FragColor = vec4(tex.rgb, 1.0);\n        }\n    '
+	    fragmentShader: '\n        uniform sampler2D map;\n        uniform vec3 weights;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 tex = texture2D(map, vUv);\n            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);\n\n            vec3 color = gray + max(tex.rgb - gray, 0.0) * weights;\n\n            gl_FragColor = vec4(color, 1.0);\n        }\n    '
 	};
 
 /***/ },

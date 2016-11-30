@@ -6,7 +6,7 @@ import THREE from 'three';
 export default {
     uniforms: {
         map: { type: 't', value: new THREE.Texture() },
-        progress: { value: 0.0 },
+        weights: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
     },
     vertexShader: `
         varying vec2 vUv;
@@ -18,23 +18,17 @@ export default {
     `,
     fragmentShader: `
         uniform sampler2D map;
-        uniform float progress;
+        uniform vec3 weights;
 
         varying vec2 vUv;
-        
-        const float radius = 0.5;
-        const float softness = 0.5;
 
         void main() {
             vec4 tex = texture2D(map, vUv);
+            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);
 
-            // vignette
-            vec2 position = vUv - vec2(0.5);
-            float len = length(position);
-            float vignette = 1.0 - smoothstep(radius, radius - softness, len);
-            tex.rgb = mix(tex.rgb, vec3(1, 0, 0), progress * vignette);
+            vec3 color = gray + max(tex.rgb - gray, 0.0) * weights;
 
-            gl_FragColor = vec4(tex.rgb, 1.0);
+            gl_FragColor = vec4(color, 1.0);
         }
     `,
 };

@@ -1,7 +1,10 @@
 import THREE from 'three'
-import pulseShader from './shaders/beat_show'///vignette_red'//beat_show'
+import pulseShader from './shaders/vignette_red'//beat_show'
+
+const sampleMax = 1024
 
 const canvas2d = document.getElementById('canvas2d')
+const decay = 0.9
 
 const nearestPowerOfTwo = dim => {
     let power = 2
@@ -15,7 +18,13 @@ export default class Renderer {
         this._container = container
         this._clock = new THREE.Clock()
         this._lastMs = 0
-        this._bpm = 60
+
+        this._state = {
+            left: {
+                last: new THREE.Vector3(0.5, 0.5, 0.5),
+                d: 0
+            }
+        }
 
         this._scene = new THREE.Scene()
 
@@ -27,7 +36,17 @@ export default class Renderer {
 
     pulse(data) {
         this._lastMs = this._clock.getElapsedTime() * 1000
-        this._bpm = data.bpm
+
+        for (const channel of ['left']) {
+            const current = new THREE.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax)
+            const d = new THREE.Vector3().subVectors(current, this._state[channel].last)
+
+            this._state[channel].d += (d.length() || 0) * 2
+            this._state[channel].d *= decay
+            this._state[channel].d = Math.max(0, this._state[channel].d)
+
+            this._state[channel].last = current
+        }
     }
 
     setImage(img) {
@@ -96,11 +115,10 @@ export default class Renderer {
         this._map.needsUpdate = true
         this._material.needsUpdate = true
 
-        const msBetweenBeats = 1 / this._bpm * 60.0 * 1000
-        const val = 1 - ((startMs - this._lastMs) / msBetweenBeats);
-        const progress = Math.min(Math.max(val, 0), 1)
-        this._material.uniforms.progress.value = progress
-        this._material.uniforms.progress.needsUpdate = true
+    
+
+        this._material.uniforms.weights.value.z = this._state.left.d
+        this._material.uniforms.weights.needsUpdate = true
 
         this._render()
     }
