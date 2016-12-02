@@ -120,7 +120,7 @@ export default class Renderer {
         this._material.needsUpdate = true
 
         this._material.uniforms.weights.value.x = this._state.right.d
-        this._material.uniforms.weights.value.z = this._state.left.d
+        this._material.uniforms.weights.value.y = this._state.left.d
         this._material.uniforms.weights.needsUpdate = true
 
         this._render()

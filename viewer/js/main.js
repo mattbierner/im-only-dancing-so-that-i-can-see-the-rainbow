@@ -72,13 +72,11 @@
 	};
 
 	// The audio context must be created inside of a touch event on IOS
-	if (onIos()) {
-	    document.body.addEventListener('touchstart', function () {
-	        return audio_context.init();
-	    }, false);
+	/*if (onIos()) {
+	    document.body.addEventListener('touchstart', () => audio_context.init(), false);
 	} else {
-	    audio_context.init();
-	}
+	    audio_context.init()
+	}*/
 
 	var renderer = new _renderer2.default(document.getElementById('canvas3d'), document.getElementById('main'));
 
@@ -96,7 +94,7 @@
 	    renderer.setImage(img);
 	    renderer.animate();
 	};
-	img.src = 'http://' + _config.viewerIp + ':1234/?action=stream_0';
+	img.src = 'http://' + _config.viewerIp + ':1234/?action=stream_0'; //"http://localhost:8000/image.jpg"
 
 /***/ },
 /* 1 */
@@ -265,7 +263,7 @@
 	            this._material.needsUpdate = true;
 
 	            this._material.uniforms.weights.value.x = this._state.right.d;
-	            this._material.uniforms.weights.value.z = this._state.left.d;
+	            this._material.uniforms.weights.value.y = this._state.left.d;
 	            this._material.uniforms.weights.needsUpdate = true;
 
 	            this._render();
