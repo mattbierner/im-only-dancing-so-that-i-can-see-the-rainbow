@@ -1,7 +1,6 @@
 import THREE from 'three';
 
 /**
- * Draws a red vignette on each beat.
  */
 export default {
     uniforms: {

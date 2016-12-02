@@ -112,17 +112,15 @@
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _vignette_red = __webpack_require__(3);
+	var _cmyk = __webpack_require__(9);
 
-	var _vignette_red2 = _interopRequireDefault(_vignette_red);
+	var _cmyk2 = _interopRequireDefault(_cmyk);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	//beat_show'
-
-	var sampleMax = 1024;
+	var sampleMax = 1023;
 
 	var canvas2d = document.getElementById('canvas2d');
 	var decay = 0.9;
@@ -133,6 +131,40 @@
 	        power <<= 1;
 	    }return power;
 	};
+
+	var SIZE = 6;
+
+	var SamplableValue = function () {
+	    function SamplableValue(size) {
+	        _classCallCheck(this, SamplableValue);
+
+	        this._size = size;
+	        this._i = 0;
+	        this._samples = [];
+	        for (var i = 0; i < this._size; ++i) {
+	            this._samples[i] = 0;
+	        }
+	    }
+
+	    _createClass(SamplableValue, [{
+	        key: 'push',
+	        value: function push(value) {
+	            this._samples[this._i] = value;
+	            this._i = (this._i + 1) % this._size;
+	        }
+	    }, {
+	        key: 'sample',
+	        value: function sample() {
+	            var sum = 0;
+	            for (var i = 0; i < this._size; ++i) {
+	                sum += this._samples[i];
+	            }
+	            return sum / this._size;
+	        }
+	    }]);
+
+	    return SamplableValue;
+	}();
 
 	var Renderer = function () {
 	    function Renderer(canvas, container) {
@@ -145,12 +177,21 @@
 	        this._lastMs = 0;
 
 	        this._state = {
-	            left: {
-	                last: new _three2.default.Vector3(0.5, 0.5, 0.5),
+	            left_leg: {
+	                avg: new SamplableValue(SIZE),
 	                d: 0
 	            },
-	            right: {
-	                last: new _three2.default.Vector3(0.5, 0.5, 0.5),
+	            right_leg: {
+	                avg: new SamplableValue(SIZE),
+	                d: 0
+	            },
+	            left_hand: {
+	                avg: new SamplableValue(SIZE),
+	                d: 0
+
+	            },
+	            right_hand: {
+	                avg: new SamplableValue(SIZE),
 	                d: 0
 	            }
 	        };
@@ -169,14 +210,18 @@
 	        key: 'pulse',
 	        value: function pulse(data) {
 	            this._lastMs = this._clock.getElapsedTime() * 1000;
-
-	            var _arr = ['left', 'right'];
+	            var _arr = ['left_leg', 'right_leg', 'left_hand', 'right_hand'];
 	            for (var _i = 0; _i < _arr.length; _i++) {
 	                var channel = _arr[_i];
 	                var current = new _three2.default.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax);
-	                var d = new _three2.default.Vector3().subVectors(current, this._state[channel].last);
+	                var l = current.length() || 0;
 
-	                this._state[channel].d += (d.length() || 0) * 2;
+	                var avg = this._state[channel].avg;
+	                var sample = avg.sample();
+	                avg.push(l);
+
+	                var d = Math.abs(l - sample);
+	                this._state[channel].d += d * 4;
 	                this._state[channel].d *= decay;
 	                this._state[channel].d = Math.max(0, this._state[channel].d);
 
@@ -222,7 +267,7 @@
 	        value: function _initMaterials() {
 	            this._map = new _three2.default.Texture(this._canvas2d);
 
-	            this._material = new _three2.default.ShaderMaterial(_vignette_red2.default);
+	            this._material = new _three2.default.ShaderMaterial(_cmyk2.default);
 	            this._material.uniforms.map.value = this._map;
 	            this._material.uniforms.map.needsUpdate = true;
 	        }
@@ -262,8 +307,9 @@
 	            this._map.needsUpdate = true;
 	            this._material.needsUpdate = true;
 
-	            this._material.uniforms.weights.value.x = this._state.right.d;
-	            this._material.uniforms.weights.value.y = this._state.left.d;
+	            this._material.uniforms.weights.value.x = this._state.right_hand.d;
+	            this._material.uniforms.weights.value.y = this._state.left_hand.d;
+	            this._material.uniforms.weights.value.z = (this._state.right_leg.d + this._state.left_leg.d) / 2;
 	            this._material.uniforms.weights.needsUpdate = true;
 
 	            this._render();
@@ -3568,34 +3614,7 @@
 	var numFrames=this.geometry.morphTargets.length;var name="__default";var startFrame=0;var endFrame=numFrames-1;var fps=numFrames/1;this.createAnimation(name,startFrame,endFrame,fps);this.setAnimationWeight(name,1);};THREE.MorphBlendMesh.prototype=Object.create(THREE.Mesh.prototype);THREE.MorphBlendMesh.prototype.constructor=THREE.MorphBlendMesh;THREE.MorphBlendMesh.prototype.createAnimation=function(name,start,end,fps){var animation={start:start,end:end,length:end-start+1,fps:fps,duration:(end-start)/fps,lastFrame:0,currentFrame:0,active:false,time:0,direction:1,weight:1,directionBackwards:false,mirroredLoop:false};this.animationsMap[name]=animation;this.animationsList.push(animation);};THREE.MorphBlendMesh.prototype.autoCreateAnimations=function(fps){var pattern=/([a-z]+)_?(\d+)/i;var firstAnimation,frameRanges={};var geometry=this.geometry;for(var i=0,il=geometry.morphTargets.length;i<il;i++){var morph=geometry.morphTargets[i];var chunks=morph.name.match(pattern);if(chunks&&chunks.length>1){var name=chunks[1];if(!frameRanges[name])frameRanges[name]={start:Infinity,end:-Infinity};var range=frameRanges[name];if(i<range.start)range.start=i;if(i>range.end)range.end=i;if(!firstAnimation)firstAnimation=name;}}for(var name in frameRanges){var range=frameRanges[name];this.createAnimation(name,range.start,range.end,fps);}this.firstAnimation=firstAnimation;};THREE.MorphBlendMesh.prototype.setAnimationDirectionForward=function(name){var animation=this.animationsMap[name];if(animation){animation.direction=1;animation.directionBackwards=false;}};THREE.MorphBlendMesh.prototype.setAnimationDirectionBackward=function(name){var animation=this.animationsMap[name];if(animation){animation.direction=-1;animation.directionBackwards=true;}};THREE.MorphBlendMesh.prototype.setAnimationFPS=function(name,fps){var animation=this.animationsMap[name];if(animation){animation.fps=fps;animation.duration=(animation.end-animation.start)/animation.fps;}};THREE.MorphBlendMesh.prototype.setAnimationDuration=function(name,duration){var animation=this.animationsMap[name];if(animation){animation.duration=duration;animation.fps=(animation.end-animation.start)/animation.duration;}};THREE.MorphBlendMesh.prototype.setAnimationWeight=function(name,weight){var animation=this.animationsMap[name];if(animation){animation.weight=weight;}};THREE.MorphBlendMesh.prototype.setAnimationTime=function(name,time){var animation=this.animationsMap[name];if(animation){animation.time=time;}};THREE.MorphBlendMesh.prototype.getAnimationTime=function(name){var time=0;var animation=this.animationsMap[name];if(animation){time=animation.time;}return time;};THREE.MorphBlendMesh.prototype.getAnimationDuration=function(name){var duration=-1;var animation=this.animationsMap[name];if(animation){duration=animation.duration;}return duration;};THREE.MorphBlendMesh.prototype.playAnimation=function(name){var animation=this.animationsMap[name];if(animation){animation.time=0;animation.active=true;}else{console.warn("THREE.MorphBlendMesh: animation["+name+"] undefined in .playAnimation()");}};THREE.MorphBlendMesh.prototype.stopAnimation=function(name){var animation=this.animationsMap[name];if(animation){animation.active=false;}};THREE.MorphBlendMesh.prototype.update=function(delta){for(var i=0,il=this.animationsList.length;i<il;i++){var animation=this.animationsList[i];if(!animation.active)continue;var frameTime=animation.duration/animation.length;animation.time+=animation.direction*delta;if(animation.mirroredLoop){if(animation.time>animation.duration||animation.time<0){animation.direction*=-1;if(animation.time>animation.duration){animation.time=animation.duration;animation.directionBackwards=true;}if(animation.time<0){animation.time=0;animation.directionBackwards=false;}}}else{animation.time=animation.time%animation.duration;if(animation.time<0)animation.time+=animation.duration;}var keyframe=animation.start+THREE.Math.clamp(Math.floor(animation.time/frameTime),0,animation.length-1);var weight=animation.weight;if(keyframe!==animation.currentFrame){this.morphTargetInfluences[animation.lastFrame]=0;this.morphTargetInfluences[animation.currentFrame]=1*weight;this.morphTargetInfluences[keyframe]=0;animation.lastFrame=animation.currentFrame;animation.currentFrame=keyframe;}var mix=animation.time%frameTime/frameTime;if(animation.directionBackwards)mix=1-mix;if(animation.currentFrame!==animation.lastFrame){this.morphTargetInfluences[animation.currentFrame]=mix*weight;this.morphTargetInfluences[animation.lastFrame]=(1-mix)*weight;}else{this.morphTargetInfluences[animation.currentFrame]=weight;}}};
 
 /***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _three = __webpack_require__(2);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	/**
-	 * Draws a red vignette on each beat.
-	 */
-	exports.default = {
-	    uniforms: {
-	        map: { type: 't', value: new _three2.default.Texture() },
-	        weights: { type: 'v3', value: new _three2.default.Vector3(0, 0, 0) }
-	    },
-	    vertexShader: '\n        varying vec2 vUv;\n        \n        void main() {\n            vUv = uv;\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n        }\n    ',
-	    fragmentShader: '\n        uniform sampler2D map;\n        uniform vec3 weights;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 tex = texture2D(map, vUv);\n            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);\n\n            vec3 color = gray + max(tex.rgb - gray, 0.0) * weights;\n\n            gl_FragColor = vec4(color, 1.0);\n        }\n    '
-	};
-
-/***/ },
+/* 3 */,
 /* 4 */
 /***/ function(module, exports) {
 
@@ -3666,9 +3685,9 @@
 	/**
 	 * Hostname of Raspberry Pi streaming server.
 	 */
-	var ip = exports.ip = 'challah.local';
+	var ip = exports.ip = 'sourdough.local';
 
-	var viewerIp = exports.viewerIp = 'sourdough.local';
+	var viewerIp = exports.viewerIp = ip;
 
 	/**
 	 * Offset in ms of when heartbeat occured and when the pi detected it
@@ -3736,6 +3755,34 @@
 	}();
 
 	exports.default = PulseSound;
+
+/***/ },
+/* 8 */,
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _three = __webpack_require__(2);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 */
+	exports.default = {
+	    uniforms: {
+	        map: { type: 't', value: new _three2.default.Texture() },
+	        weights: { type: 'v3', value: new _three2.default.Vector3(0, 0, 0) }
+	    },
+	    vertexShader: '\n        varying vec2 vUv;\n        \n        void main() {\n            vUv = uv;\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n        }\n    ',
+	    fragmentShader: '\n        uniform sampler2D map;\n        uniform vec3 weights;\n\n        varying vec2 vUv;\n\n        vec4 rgbToCmyk(vec3 rgb) {\n            float k = min(1.0 - rgb.r, min(1.0 - rgb.g, 1.0 - rgb.b));\n            return vec4((1.0 - rgb - k) / (1.0 - k), k);\n        }\n\n        vec3 cmykToRgb(vec4 cmyk) { \n            return 1.0 - min(vec3(1.0), cmyk.xyz * ( 1.0 - cmyk.w ) + cmyk.w);\n        }\n\n        void main() {\n            vec4 tex = texture2D(map, vUv);\n            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);\n\n            vec4 cmyk = rgbToCmyk(tex.rgb);\n            vec4 graycmyk = rgbToCmyk(gray);\n\n            vec4 color = graycmyk + max(cmyk - graycmyk, 0.0) * vec4(weights, 1.0);\n\n            gl_FragColor = vec4(cmykToRgb(color), 1.0);\n        }\n    '
+	};
 
 /***/ }
 /******/ ]);

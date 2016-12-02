@@ -1,7 +1,7 @@
 import THREE from 'three'
-import pulseShader from './shaders/vignette_red'//beat_show'
+import pulseShader from './shaders/cmyk'
 
-const sampleMax = 1024
+const sampleMax = 1023
 
 const canvas2d = document.getElementById('canvas2d')
 const decay = 0.9
@@ -13,6 +13,31 @@ const nearestPowerOfTwo = dim => {
     return power
 }
 
+const SIZE = 6
+
+class SamplableValue {
+    constructor(size) {
+        this._size = size
+        this._i = 0
+        this._samples = []
+        for (let i = 0; i < this._size; ++i)
+            this._samples[i] = 0;
+    }
+
+    push(value) {
+        this._samples[this._i] = value
+        this._i = (this._i + 1) % this._size
+    }
+
+    sample() {
+        let sum = 0
+        for (let i = 0; i < this._size; ++i) {
+            sum += this._samples[i]
+        }
+        return sum / this._size
+    }
+}
+
 export default class Renderer {
     constructor(canvas, container) {
         this._container = container
@@ -20,12 +45,21 @@ export default class Renderer {
         this._lastMs = 0
 
         this._state = {
-            left: {
-                last: new THREE.Vector3(0.5, 0.5, 0.5),
+            left_leg: {
+                avg: new SamplableValue(SIZE),
                 d: 0
             },
-            right: {
-                last: new THREE.Vector3(0.5, 0.5, 0.5),
+            right_leg: {
+                avg: new SamplableValue(SIZE),
+                d: 0
+            },
+            left_hand: {
+                avg: new SamplableValue(SIZE),
+                d: 0
+
+            },
+            right_hand: {
+                avg: new SamplableValue(SIZE),
                 d: 0
             }
         }
@@ -40,12 +74,16 @@ export default class Renderer {
 
     pulse(data) {
         this._lastMs = this._clock.getElapsedTime() * 1000
-
-        for (const channel of ['left', 'right']) {
+        for (const channel of ['left_leg', 'right_leg', 'left_hand', 'right_hand']) {
             const current = new THREE.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax)
-            const d = new THREE.Vector3().subVectors(current, this._state[channel].last)
+            const l = current.length() || 0
 
-            this._state[channel].d += (d.length() || 0) * 2
+            const avg = this._state[channel].avg
+            const sample =  avg.sample()
+            avg.push(l)
+            
+            const d = Math.abs(l - sample);
+            this._state[channel].d += (d * 4)
             this._state[channel].d *= decay
             this._state[channel].d = Math.max(0, this._state[channel].d)
 
@@ -119,8 +157,9 @@ export default class Renderer {
         this._map.needsUpdate = true
         this._material.needsUpdate = true
 
-        this._material.uniforms.weights.value.x = this._state.right.d
-        this._material.uniforms.weights.value.y = this._state.left.d
+        this._material.uniforms.weights.value.x = this._state.right_hand.d
+        this._material.uniforms.weights.value.y = this._state.left_hand.d
+        this._material.uniforms.weights.value.z = (this._state.right_leg.d + this._state.left_leg.d) / 2
         this._material.uniforms.weights.needsUpdate = true
 
         this._render()
