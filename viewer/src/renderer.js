@@ -1,20 +1,12 @@
 import THREE from 'three'
 import pulseShader from './shaders/cmyk'
 
-import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing/EffectComposer';
-import CopyShader from 'imports?THREE=three!three/examples/js/shaders/CopyShader';
-import ConvolutionShader from 'imports?THREE=three!three/examples/js/shaders/ConvolutionShader';
+import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing/EffectComposer'
 
-import BloomPass from 'imports?THREE=three!three/examples/js/postprocessing/BloomPass';
-import RenderPass from 'imports?THREE=three!three/examples/js/postprocessing/RenderPass';
-import ShaderPass from 'imports?THREE=three!three/examples/js/postprocessing/ShaderPass';
-import MaskPass from 'imports?THREE=three!three/examples/js/postprocessing/MaskPass';
-import HorizontalBlurShader from 'imports?THREE=three!three/examples/js/shaders/HorizontalBlurShader';
-import VerticalBlurShader from 'imports?THREE=three!three/examples/js/shaders/VerticalBlurShader';
+import RenderPass from 'imports?THREE=three!three/examples/js/postprocessing/RenderPass'
+import ShaderPass from 'imports?THREE=three!three/examples/js/postprocessing/ShaderPass'
 
-import additive_shader from './shaders/additive';
-import gray_scale_shader from './shaders/grayscale';
-
+import Collector from './collector'
 
 const sampleMax = 1023
 
@@ -34,59 +26,13 @@ const nearestPowerOfTwo = dim => {
 
 
 
-class SamplableValue {
-    constructor() {
-        this._size = SIZE
-        this._i = 0
-        this._samples = []
-        for (let i = 0; i < this._size; ++i)
-            this._samples[i] = 0;
-    }
-
-    push(value) {
-        this._samples[this._i] = value
-        this._i = (this._i + 1) % this._size
-    }
-
-    sample() {
-        let sum = 0
-        for (let i = 0; i < this._size; ++i) {
-            sum += this._samples[i]
-        }
-        return sum / this._size
-    }
-}
-
-class Sensor {
-    constructor() {
-        this.avg = { x: new SamplableValue(), y: new SamplableValue(), z: new SamplableValue() };
-        this.d = 0
-    }
-
-    push(x, y, z) {
-        const ax = this.avg.x.sample()
-        const ay = this.avg.y.sample()
-        const az = this.avg.z.sample()
-
-        this.avg.x.push(x)
-        this.avg.y.push(y)
-        this.avg.z.push(z)
-        return new THREE.Vector3(ax - x, ay - y, az - z)
-    }
-}
-
 export default class Renderer {
     constructor(canvas, container) {
         this._container = container
         this._clock = new THREE.Clock()
         this._lastMs = 0
 
-        this._state = {
-            left_leg: new Sensor(),
-            right_leg: new Sensor(),
-            left_hand: new Sensor(),
-            right_hand: new Sensor()
-        }
+        this._state = new Collector()
 
         this._scene = new THREE.Scene()
 
@@ -104,53 +50,28 @@ export default class Renderer {
     initComposer() {
         this._composer = new THREE.EffectComposer(this._renderer);
         const r1 = new THREE.RenderPass(this._scene, this._camera)
-        this._composer.addPass(r1);
+        this._composer.addPass(r1)
 
-        this._s2 = new THREE.ShaderPass(pulseShader, 'map');
-        this._composer.addPass(this._s2);
-
-        if (true) {
-            this._effectHorizBlur = new THREE.ShaderPass(THREE.HorizontalBlurShader);
-            this._effectVertiBlur = new THREE.ShaderPass(THREE.VerticalBlurShader);
-
-            const [viewWidth, viewHeight] = this._getViewportSize();
-            this._effectHorizBlur.uniforms["h"].value = 1 / viewWidth;
-            this._effectVertiBlur.uniforms["v"].value = 1 / viewHeight;
-            this._composer.addPass(this._effectHorizBlur);
-            this._composer.addPass(this._effectVertiBlur);
-        }
-
-        //final render pass
-        this._composer2 = new THREE.EffectComposer(this._renderer);
-
-        const r2 = new THREE.RenderPass(this._scene, this._camera)
-        this._composer2.addPass(r2);
-
-        var effectBlend = new THREE.ShaderPass(additive_shader, 'tDiffuse1');
-        effectBlend.uniforms['tDiffuse2'].value = this._composer.renderTarget2.texture;
-        effectBlend.renderToScreen = true;
-        this._composer2.addPass(effectBlend);
+        this._s2 = new THREE.ShaderPass(pulseShader, 'map')
+        this._composer.addPass(this._s2)
+        this._s2.renderToScreen = true
     }
 
     pulse(data) {
-        this._lastMs = this._clock.getElapsedTime() * 1000
-        for (const channel of ['left_leg', 'right_leg', 'left_hand', 'right_hand']) {
-            const current = new THREE.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax)
-            let d = this._state[channel].push(current.x, current.y, current.z).length()
-            this._state[channel].d += (d * GAIN_SCALE)
-            this._state[channel].d *= decay
-            this._state[channel].d = Math.max(0, Math.min(MAX_GAIN, this._state[channel].d))
-
-            this._state[channel].last = current
-        }
+        this._state.push(data)
     }
 
-    setImage(img) {
-        this._stream = img
-        this._canvas2d = this._createCanvas(img)
-        this._ctx = this._canvas2d.getContext('2d')
-        this._ctx.translate(this._canvas2d.width, this._canvas2d.height);
-        this._ctx.scale(-1, -1);
+    setImage(left, right) {
+        this._streamLeft = left
+        this._streamRight = right
+
+        const [canvasLeft, ctxLeft] = this._createCanvas(left)
+        const [canvasRight, ctxRight] = this._createCanvas(right)
+
+        this._canvasLeft = canvasLeft
+        this._ctxLeft = ctxLeft
+        this._canvasRight = canvasRight
+        this._ctxRight = ctxRight
 
         this._initMaterials()
         this._initGeometry()
@@ -160,7 +81,11 @@ export default class Renderer {
         const canvas = document.createElement('canvas')
         canvas.width = nearestPowerOfTwo(img.width)
         canvas.height = nearestPowerOfTwo(img.height)
-        return canvas
+
+        const ctx = canvas.getContext('2d')
+        ctx.translate(canvas.width, canvas.height)
+        ctx.scale(-1, -1)
+        return [canvas, ctx]
     }
 
     _initRenderer(canvas) {
@@ -175,22 +100,22 @@ export default class Renderer {
     }
 
     _initMaterials() {
-        this._map = new THREE.Texture(this._canvas2d)
+        this._mapLeft = new THREE.Texture(this._canvasLeft)
+        this._materialLeft = new THREE.MeshBasicMaterial({ map: this._mapLeft })
 
-        this._material = new THREE.MeshBasicMaterial({ map: this._map })
-        //this._material.uniforms.map.value = this._map
-        //this._material.uniforms.map.needsUpdate = true
+        this._mapRight = new THREE.Texture(this._canvasRight)
+        this._materialRight = new THREE.MeshBasicMaterial({ map: this._mapRight })
     }
 
     _initGeometry() {
         // Poor mans webvr :)
         const geometry = new THREE.PlaneGeometry(1, 2);
 
-        this._left = new THREE.Mesh(geometry, this._material)
+        this._left = new THREE.Mesh(geometry, this._materialLeft)
         this._left.position.setX(-0.5)
         this._scene.add(this._left)
 
-        this._right = new THREE.Mesh(geometry, this._material)
+        this._right = new THREE.Mesh(geometry, this._materialRight)
         this._right.position.setX(0.5)
         this._scene.add(this._right)
     }
@@ -210,7 +135,7 @@ export default class Renderer {
         const bufferWidth = width * scaling;
         const bufferHeight = height * scaling;
         this._composer.setSize(bufferWidth, bufferHeight);
-        this._composer2.setSize(bufferWidth, bufferHeight);
+        this._composer2 && this._composer2.setSize(bufferWidth, bufferHeight);
     }
 
     animate() {
@@ -220,23 +145,24 @@ export default class Renderer {
         requestAnimationFrame(() => this.animate())
 
         // Update image
-        this._ctx.drawImage(this._stream, 0, 0, this._canvas2d.width, this._canvas2d.height)
-        this._map.needsUpdate = true
-        this._material.needsUpdate = true
+        this._ctxLeft.drawImage(this._streamLeft, 0, 0, this._canvasLeft.width, this._canvasLeft.height)
+        this._mapLeft.needsUpdate = true
+        this._materialLeft.needsUpdate = true
+
+        this._ctxRight.drawImage(this._streamRight, 0, 0, this._canvasRight.width, this._canvasRight.height)
+        this._mapRight.needsUpdate = true
+        this._materialRight.needsUpdate = true
 
         this._s2.uniforms.weights.value.x = this._state.right_hand.d
         this._s2.uniforms.weights.value.y = this._state.left_hand.d
         this._s2.uniforms.weights.value.z = (this._state.right_leg.d + this._state.left_leg.d) / 2
         this._s2.uniforms.weights.needsUpdate = true
 
-        //this._bloom.materialCopy.uniforms.opacity.value = this._state.right_hand.d
-        //this._bloom.materialCopy.uniforms.opacity.needsUpdate = true
-
         this._render()
     }
 
     _render() {
         this._composer.render()
-        this._composer2.render()
+        this._composer2 && this._composer2.render()
     }
 }

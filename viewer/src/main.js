@@ -1,7 +1,7 @@
 import Renderer from './renderer'
 import * as audio_context from './audio_context'
-import {createPulseClient} from './pulse_client'
-import {viewerIp} from './config'
+import { createPulseClient } from './pulse_client'
+import { viewerIp } from './config'
 import PulseSound from './pulse_sound'
 
 const onIos = () =>
@@ -21,15 +21,26 @@ const renderer = new Renderer(
 //const sound = new PulseSound()
 
 createPulseClient((data) => {
-  //  console.log(data);
+    //  console.log(data);
     renderer.pulse(data)
     //sound.play()
 })
 
-const img = new Image()
-img.crossOrigin = 'anonymous'
-img.onload = () => {
-    renderer.setImage(img)
-    renderer.animate()
+const loadStream = (number) => {
+    let res;
+    const p = new Promise((r) => { res = r; })
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+        res(img)
+    }
+    img.src = `http://${viewerIp}:1234/?action=stream_${number}`//"http://localhost:8000/image.jpg"
+    return p;
 }
-img.src = `http://${viewerIp}:1234/?action=stream_0`//"http://localhost:8000/image.jpg"
+
+loadStream(0).then(img1 =>
+    loadStream(1).then(img2 => {
+        renderer.setImage(img1, img2)
+        renderer.animate()
+    })).catch(x=> console.error(x))
