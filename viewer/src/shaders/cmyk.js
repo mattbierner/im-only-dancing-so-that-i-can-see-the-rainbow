@@ -37,9 +37,9 @@ export default {
             vec4 cmyk = rgbToCmyk(tex.rgb);
             vec4 graycmyk = rgbToCmyk(gray);
 
-            vec4 color = graycmyk + max(cmyk - graycmyk, 0.0) * vec4(weights, 1.0);
+            vec4 color = cmyk + max(cmyk - graycmyk, 0.0) * vec4(weights, 1.0);
 
-            gl_FragColor = vec4(cmykToRgb(color), 1.0);
+            gl_FragColor = vec4(cmykToRgb(color), tex.w);
         }
     `,
 };
