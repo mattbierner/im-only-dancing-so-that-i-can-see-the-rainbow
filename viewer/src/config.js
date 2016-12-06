@@ -1,11 +1,6 @@
 /**
  * Hostname of Raspberry Pi streaming server.
  */
-export const ip =  'sourdough.local';
+export const ip = window.location.href.indexOf('phone') >= 0 ? '172.20.10.3' : 'sourdough.local';
 
 export const viewerIp =  ip;
-
-/**
- * Offset in ms of when heartbeat occured and when the pi detected it
- */
-export const beatoffset = -75

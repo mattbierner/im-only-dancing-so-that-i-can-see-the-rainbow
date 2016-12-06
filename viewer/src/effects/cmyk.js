@@ -1,8 +1,7 @@
-import THREE from 'three';
+import THREE from 'three'
+import BaseColorEffect from './color_base'
 
-/**
- */
-export default {
+const shader = {
     uniforms: {
         map: { type: 't', value: new THREE.Texture() },
         weights: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
@@ -43,3 +42,9 @@ export default {
         }
     `,
 };
+
+export default class Cmyk extends BaseColorEffect {
+    constructor() {
+        super(shader)
+    }
+}

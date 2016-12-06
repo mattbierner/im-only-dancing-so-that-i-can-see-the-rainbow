@@ -2,8 +2,8 @@ import THREE from 'three'
 
 const sampleMax = 1023
 
-const decay = 0.975
-const SIZE = 6
+
+const SIZE = 4
 
 const MAX_GAIN = 255
 const GAIN_SCALE = 0.2
@@ -33,9 +33,12 @@ class SamplableValue {
 }
 
 class Sensor {
-    constructor() {
+    constructor(decay) {
+        this.decay = decay;
         this.avg = { x: new SamplableValue(), y: new SamplableValue(), z: new SamplableValue() };
         this.d = 0
+        this.delta = new THREE.Vector3(0, 0, 0)
+        this.change = new THREE.Vector3(0, 0, 0)
     }
 
     push(x, y, z) {
@@ -46,25 +49,30 @@ class Sensor {
         this.avg.x.push(x)
         this.avg.y.push(y)
         this.avg.z.push(z)
-        return new THREE.Vector3(ax - x, ay - y, az - z)
+        this.delta = new THREE.Vector3(ax - x, ay - y, az - z)
+
+        this.change.x += Math.abs(this.delta.x) * GAIN_SCALE
+        this.change.y += Math.abs(this.delta.y) * GAIN_SCALE
+        this.change.z += Math.abs(this.delta.z) * GAIN_SCALE
+        this.change.multiplyScalar(this.decay)
+
+        this.d = this.change.length()
     }
 }
 
 export default class Collector {
-    constructor() {
-        this.left_leg = new Sensor()
-        this.right_leg = new Sensor()
-        this.left_hand = new Sensor()
-        this.right_hand = new Sensor()
+    constructor(decay) {
+        this.decay = decay
+        this.left_leg = new Sensor(decay)
+        this.right_leg = new Sensor(decay)
+        this.left_hand = new Sensor(decay)
+        this.right_hand = new Sensor(decay)
     }
 
     push(data) {
         for (const channel of ['left_leg', 'right_leg', 'left_hand', 'right_hand']) {
             const current = new THREE.Vector3(data[channel].x, data[channel].y, data[channel].z).divideScalar(sampleMax)
-            let d = this[channel].push(current.x, current.y, current.z).length()
-            this[channel].d += (d * GAIN_SCALE)
-            this[channel].d *= decay
-            this[channel].d = Math.max(0, Math.min(MAX_GAIN, this[channel].d))
+            this[channel].push(current.x, current.y, current.z)
         }
     }
 }
