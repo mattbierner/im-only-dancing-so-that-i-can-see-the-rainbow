@@ -4425,9 +4425,9 @@
 
 	var _tv2 = _interopRequireDefault(_tv);
 
-	var _hdr = __webpack_require__(27);
+	var _bloom = __webpack_require__(28);
 
-	var _hdr2 = _interopRequireDefault(_hdr);
+	var _bloom2 = _interopRequireDefault(_bloom);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4446,11 +4446,9 @@
 	        this._tv = new _tv2.default();
 	        this._rgbShift = new _rgb_shift2.default();
 
-	        this._effects = [this._lut,
-	        //        new hdr(),
-	        this._rgbShift,
-	        //   this._tv,
-	        this._blur];
+	        this._effects = [
+	        //        this._lut,
+	        new _bloom2.default()];
 	    }
 
 	    _createClass(Neon, [{
@@ -4742,7 +4740,8 @@
 /* 24 */,
 /* 25 */,
 /* 26 */,
-/* 27 */
+/* 27 */,
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4764,12 +4763,10 @@
 	var shader = {
 	    uniforms: {
 	        tDiffuse: { type: 'tDiffuse', value: null },
-	        amount: { type: 'f', value: 0.5 },
-	        multiplier: { type: 'f', value: 1 }
-
+	        strength: { type: 'f', value: 0.5 }
 	    },
 	    vertexShader: __webpack_require__(6),
-	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float amount;\n        uniform float multiplier;\n\n        varying vec2 vUv;\n\n        float luminance(vec3 rgb) {\n            const vec3 W = vec3(0.2125, 0.7154, 0.0721);\n            return dot(rgb, W);\n        }\n\n        void main() {\n            vec4 tex = texture2D(tDiffuse, vUv);\n            vec3 sample = tex.rgb;\n            float std = min(amount, (1.0 - amount));\n            float score = (luminance(tex.rgb) - amount) / std;\n            tex.rgb = (tex.rgb * exp2(score)) - tex.rgb;\n            tex *= multiplier;\n            gl_FragColor = vec4(tex.rgb + sample, tex.a);\n        }\n    '
+	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float strength;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 main =  texture2D(tDiffuse, vUv);;\n            float gamma = 1.0 - pow(main.r, _Strength);\n            main.rgb += (main.rgb * main.a) * saturate(gamma);\n            gl_FragColor = main;\n        }\n    '
 	};
 
 	var PosterEffect = function () {

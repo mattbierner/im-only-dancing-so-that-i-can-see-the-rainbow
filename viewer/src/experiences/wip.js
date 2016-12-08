@@ -2,7 +2,7 @@ import BlurEffect from '../effects/blur'
 import LutEffect from '../effects/lut'
 import RgbShiftEffect from '../effects/rgb_shift'
 import TvEffect from '../effects/tv'
-import hdr from '../effects/hdr'
+import hdr from '../effects/bloom'
 
 /**
  * 80s workout video
@@ -15,11 +15,11 @@ export default class Neon {
         this._rgbShift = new RgbShiftEffect()
 
         this._effects = [
-            this._lut,
-    //        new hdr(),
-            this._rgbShift,
+    //        this._lut,
+            new hdr(),
+      //      this._rgbShift,
          //   this._tv,
-            this._blur,
+        //    this._blur,
         ]
 
     }
