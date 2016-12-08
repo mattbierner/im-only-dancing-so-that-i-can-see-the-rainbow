@@ -4766,7 +4766,7 @@
 	        strength: { type: 'f', value: 0.5 }
 	    },
 	    vertexShader: __webpack_require__(6),
-	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float strength;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 main =  texture2D(tDiffuse, vUv);;\n            float gamma = 1.0 - pow(main.r, _Strength);\n            main.rgb += (main.rgb * main.a) * saturate(gamma);\n            gl_FragColor = main;\n        }\n    '
+	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float strength;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 main =  texture2D(tDiffuse, vUv);;\n            float gamma = 1.0 - pow(main.r, strength);\n            main.rgb += (main.rgb * main.a) * saturate(gamma);\n            gl_FragColor = main;\n        }\n    '
 	};
 
 	var PosterEffect = function () {
