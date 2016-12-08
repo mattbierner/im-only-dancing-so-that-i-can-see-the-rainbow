@@ -4,7 +4,7 @@ import THREE from 'three'
 //https://github.com/jjhesk/unity-interview/blob/master/Assets/Resources/Aubergine/Shaders/ImageEffects/LineArt.shader
 const shader = {
     uniforms: {
-        map: { type: 'map', value: new THREE.Texture() }
+        map: { type: 'map', value: null }
     },
     vertexShader: require('./standard.vert'),
     fragmentShader: `

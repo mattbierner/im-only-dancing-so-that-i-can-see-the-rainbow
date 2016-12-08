@@ -50,9 +50,9 @@
 
 	var _renderer2 = _interopRequireDefault(_renderer);
 
-	var _pulse_client = __webpack_require__(11);
+	var _pulse_client = __webpack_require__(12);
 
-	var _config = __webpack_require__(12);
+	var _config = __webpack_require__(13);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -109,27 +109,27 @@
 
 	var _cmyk2 = _interopRequireDefault(_cmyk);
 
-	var _wip = __webpack_require__(29);
+	var _wip = __webpack_require__(19);
 
 	var _wip2 = _interopRequireDefault(_wip);
 
-	var _CopyShader = __webpack_require__(6);
+	var _CopyShader = __webpack_require__(7);
 
 	var _CopyShader2 = _interopRequireDefault(_CopyShader);
 
-	var _EffectComposer = __webpack_require__(7);
+	var _EffectComposer = __webpack_require__(8);
 
 	var _EffectComposer2 = _interopRequireDefault(_EffectComposer);
 
-	var _TexturePass = __webpack_require__(8);
+	var _TexturePass = __webpack_require__(9);
 
 	var _TexturePass2 = _interopRequireDefault(_TexturePass);
 
-	var _RenderPass = __webpack_require__(9);
+	var _RenderPass = __webpack_require__(10);
 
 	var _RenderPass2 = _interopRequireDefault(_RenderPass);
 
-	var _ShaderPass = __webpack_require__(10);
+	var _ShaderPass = __webpack_require__(11);
 
 	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
 
@@ -3680,7 +3680,7 @@
 	        map: { type: 't', value: new _three2.default.Texture() },
 	        weights: { type: 'v3', value: new _three2.default.Vector3(0, 0, 0) }
 	    },
-	    vertexShader: __webpack_require__(22),
+	    vertexShader: __webpack_require__(6),
 	    fragmentShader: '\n        uniform sampler2D map;\n        uniform vec3 weights;\n\n        varying vec2 vUv;\n\n        vec4 rgbToCmyk(vec3 rgb) {\n            float k = min(1.0 - rgb.r, min(1.0 - rgb.g, 1.0 - rgb.b));\n            return vec4((1.0 - rgb - k) / (1.0 - k), k);\n        }\n\n        vec3 cmykToRgb(vec4 cmyk) { \n            return 1.0 - min(vec3(1.0), cmyk.xyz * ( 1.0 - cmyk.w ) + cmyk.w);\n        }\n\n        void main() {\n            vec4 tex = texture2D(map, vUv);\n            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);\n\n            vec4 cmyk = rgbToCmyk(tex.rgb);\n            vec4 graycmyk = rgbToCmyk(gray);\n\n            vec4 color = graycmyk + max(cmyk - graycmyk, 0.0) * vec4(weights, 1.0);\n\n            gl_FragColor = vec4(cmykToRgb(color), tex.w);\n        }\n    '
 	};
 
@@ -3885,6 +3885,12 @@
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	module.exports = "#define GLSLIFY 1\nvarying vec2 vUv;\n\nvoid main() {\n    vUv = uv;\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n}"
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -3915,7 +3921,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -4083,7 +4089,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -4140,7 +4146,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -4200,7 +4206,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -4270,7 +4276,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4280,7 +4286,7 @@
 	});
 	exports.createPulseClient = undefined;
 
-	var _config = __webpack_require__(12);
+	var _config = __webpack_require__(13);
 
 	/**
 	 * 
@@ -4295,7 +4301,7 @@
 	};
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4311,28 +4317,9 @@
 	var viewerIp = exports.viewerIp = ip;
 
 /***/ },
-/* 13 */,
 /* 14 */,
 /* 15 */,
-/* 16 */,
-/* 17 */,
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */
-/***/ function(module, exports) {
-
-	module.exports = "#define GLSLIFY 1\nvarying vec2 vUv;\n\nvoid main() {\n    vUv = uv;\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n}"
-
-/***/ },
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4347,31 +4334,126 @@
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _selective_color = __webpack_require__(31);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var _selective_color2 = _interopRequireDefault(_selective_color);
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var shader = {
+	    uniforms: {
+	        tDiffuse: { type: 't', value: new _three2.default.Texture() },
+	        table: { type: 't', value: null },
+	        strength: { type: 'f', value: 1.0 }
+	    },
+	    vertexShader: __webpack_require__(6),
+	    fragmentShader: __webpack_require__(17)
+	};
+
+	/**
+	 * Lookup table effect.
+	 */
+
+	var Lut = function () {
+	    function Lut(tablePath) {
+	        var _this = this;
+
+	        _classCallCheck(this, Lut);
+
+	        this._pass = new _three2.default.ShaderPass(shader);
+	        new _three2.default.TextureLoader().load(tablePath, function (tex) {
+	            tex.minFilter = tex.magFilter = _three2.default.NearestFilter;
+	            tex.needsUpdate = true;
+	            _this._pass.uniforms.table.value = tex;
+	            _this._pass.uniforms.table.needsUpdate = true;
+	        });
+	    }
+
+	    _createClass(Lut, [{
+	        key: 'getPasses',
+	        value: function getPasses() {
+	            return [this._pass];
+	        }
+	    }, {
+	        key: 'setStrength',
+	        value: function setStrength(value) {
+	            this._pass.uniforms.strength.value = value;
+	            this._pass.uniforms.strength.needsUpdate = true;
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update(time) {
+	            /* noop */
+	        }
+	    }]);
+
+	    return Lut;
+	}();
+
+	exports.default = Lut;
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	module.exports = "#define GLSLIFY 1\n#define LUT_FLIP_Y 1\nvec4 lookup_1_0(in vec4 textureColor, in sampler2D lookupTable) {\n    #ifndef LUT_NO_CLAMP\n        textureColor = clamp(textureColor, 0.0, 1.0);\n    #endif\n\n    mediump float blueColor = textureColor.b * 63.0;\n\n    mediump vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n\n    mediump vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n\n    highp vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos1.y = 1.0-texPos1.y;\n    #endif\n\n    highp vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos2.y = 1.0-texPos2.y;\n    #endif\n\n    lowp vec4 newColor1 = texture2D(lookupTable, texPos1);\n    lowp vec4 newColor2 = texture2D(lookupTable, texPos2);\n\n    lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor;\n}\n\n\n\nuniform sampler2D tDiffuse;\nuniform sampler2D table;\n\nuniform float strength;\n\nvarying vec2 vUv;\n\nvoid main() {\n    vec4 tex = texture2D(tDiffuse, vUv);\n    gl_FragColor = mix(tex, lookup_1_0(tex, table), strength);\n}\n"
+
+/***/ },
+/* 18 */,
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _blur = __webpack_require__(21);
+
+	var _blur2 = _interopRequireDefault(_blur);
+
+	var _lut = __webpack_require__(16);
+
+	var _lut2 = _interopRequireDefault(_lut);
+
+	var _rgb_shift = __webpack_require__(22);
+
+	var _rgb_shift2 = _interopRequireDefault(_rgb_shift);
+
+	var _tv = __webpack_require__(23);
+
+	var _tv2 = _interopRequireDefault(_tv);
+
+	var _hdr = __webpack_require__(27);
+
+	var _hdr2 = _interopRequireDefault(_hdr);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	/**
-	 * Rainbow immersion
+	 * 80s workout video
 	 */
 
-	var Rainbow = function () {
-	    function Rainbow() {
-	        _classCallCheck(this, Rainbow);
+	var Neon = function () {
+	    function Neon() {
+	        _classCallCheck(this, Neon);
 
-	        this._selective = new _selective_color2.default([[0.3, new _three2.default.Vector3(1.0, 0.3, 0.3), new _three2.default.Vector3(1, 0, 0)],
-	        //[0.15, new THREE.Vector3(0.5, 0.6, .60), new THREE.Vector3(0, 1, 0)],
-	        [0.2, new _three2.default.Vector3(.3, 0.7, 0.9), new _three2.default.Vector3(0, 0, 1)]]);
-	        this._selective.setStrength(0.7);
+	        this._lut = new _lut2.default('./resources/luts/lut_neon.png');
+	        this._blur = new _blur2.default();
+	        this._tv = new _tv2.default();
+	        this._rgbShift = new _rgb_shift2.default();
 
-	        this._effects = [this._selective];
+	        this._effects = [this._lut,
+	        //        new hdr(),
+	        this._rgbShift,
+	        //   this._tv,
+	        this._blur];
 	    }
 
-	    _createClass(Rainbow, [{
+	    _createClass(Neon, [{
 	        key: 'getPasses',
 	        value: function getPasses(composer) {
 	            return [].concat.apply([], [].concat.apply([], this._effects.map(function (x) {
@@ -4381,7 +4463,7 @@
 	    }, {
 	        key: 'push',
 	        value: function push(data) {
-	            //noop
+	            this._sound.pulse(data);
 	        }
 	    }, {
 	        key: 'update',
@@ -4392,14 +4474,14 @@
 	        }
 	    }]);
 
-	    return Rainbow;
+	    return Neon;
 	}();
 
-	exports.default = Rainbow;
+	exports.default = Neon;
 
 /***/ },
-/* 30 */,
-/* 31 */
+/* 20 */,
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4407,8 +4489,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-
-	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -4420,41 +4500,92 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var ARRAY_SIZE = 8;
-
-	var repeat = function repeat(x, times) {
-	    var out = [];
-	    for (var i = 0; i < times; ++i) {
-	        out.push(x);
-	    }return out;
-	};
-
 	var shader = {
 	    uniforms: {
 	        tDiffuse: { type: 't', value: null },
-	        saturation: { type: 'f', value: 1.0 },
-	        tolerance: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
-	        strength: { type: 'f', value: 0.4 },
-	        targetColors: { type: 'v3v', value: repeat(new _three2.default.Vector3(-100, -100, -100), ARRAY_SIZE) },
-	        replacementColors: { type: 'v3v', value: repeat(new _three2.default.Vector3(-100, -100, -100), ARRAY_SIZE) }
+	        strength: { type: 'f', value: 0.001 }
 	    },
-	    vertexShader: __webpack_require__(22),
-	    fragmentShader: '\n        #define SIZE ' + ARRAY_SIZE + '\n\n        uniform sampler2D tDiffuse;\n        uniform float saturation;\n        uniform float tolerance[SIZE];\n        uniform float strength;\n        uniform vec3 targetColors[SIZE];\n        uniform vec3 replacementColors[SIZE];\n\n        varying vec2 vUv;\n\n        float luminance(vec3 rgb) {\n            const vec3 W = vec3(0.2125, 0.7154, 0.0721);\n            return dot(rgb, W);\n        }\n\n        float max3(vec3 v) {\n            return max(max(v.x, v.y), v.z);\n        }\n\n        void main() {\n            vec4 tex = texture2D(tDiffuse, vUv);\n            vec3 gray = vec3(luminance(tex.rgb) * saturation);\n            vec3 result = gray;\n            for (int i = 0; i < SIZE; ++i) {\n                vec3 diff = abs(tex.rgb - targetColors[i]);\n                if (max3(diff) < tolerance[i]) {\n                    result = mix(result, replacementColors[i], strength);\n                    //result = mix(result, replacementColors[i], strength * (tolerance - max3(diff)));\n                }\n            }\n            gl_FragColor = vec4(result, tex.a);\n        }'
+	    vertexShader: __webpack_require__(6),
+	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float strength;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 main = texture2D(tDiffuse, vUv);\n\n            main.rgb += texture2D(tDiffuse, vUv + strength * 1.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 2.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 3.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 4.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 5.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 1.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 2.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 3.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 4.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 5.0).rgb;\n\n            main.rgb /= 10.0;\n\n            gl_FragColor = main;\n        }\n    '
 	};
 
 	/**
-	 * Selects one color and replaces it with another solid color
+	 * Multisample blur
 	 */
 
-	var SelectiveColor = function () {
-	    function SelectiveColor(replacements) {
-	        _classCallCheck(this, SelectiveColor);
+	var BlurEffect = function () {
+	    function BlurEffect() {
+	        _classCallCheck(this, BlurEffect);
 
 	        this._pass = new _three2.default.ShaderPass(shader);
-	        this.setColors(replacements);
 	    }
 
-	    _createClass(SelectiveColor, [{
+	    _createClass(BlurEffect, [{
+	        key: 'getPasses',
+	        value: function getPasses() {
+	            return [this._pass];
+	        }
+	    }, {
+	        key: 'setStrength',
+	        value: function setStrength(value) {
+	            this._pass.uniforms.strength.value = value;
+	            this._pass.uniforms.strength.needsUpdate = true;
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update(time) {
+	            /* noop */
+	        }
+	    }]);
+
+	    return BlurEffect;
+	}();
+
+	exports.default = BlurEffect;
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _three = __webpack_require__(2);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	// From felixturner / http://airtight.cc/
+	var shader = {
+	    uniforms: {
+	        tDiffuse: { type: 't', value: null },
+	        amount: { type: 'f', value: 0.005 },
+	        angle: { type: 'f', value: 0.0 }
+	    },
+	    vertexShader: __webpack_require__(6),
+	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float amount;\n        uniform float angle;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec2 offset = amount * vec2( cos(angle), sin(angle));\n            vec4 cr = texture2D(tDiffuse, vUv + offset);\n            vec4 cga = texture2D(tDiffuse, vUv);\n            vec4 cb = texture2D(tDiffuse, vUv - offset);\n            gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);\n        }'
+	};
+
+	/**
+	 * Rgb Shift Effect
+	 */
+
+	var RgbShift = function () {
+	    function RgbShift(tablePath) {
+	        _classCallCheck(this, RgbShift);
+
+	        this._pass = new _three2.default.ShaderPass(shader);
+	    }
+
+	    _createClass(RgbShift, [{
 	        key: 'getPasses',
 	        value: function getPasses() {
 	            return [this._pass];
@@ -4464,57 +4595,206 @@
 	        value: function update(time) {
 	            /* noop */
 	        }
-	    }, {
-	        key: 'setStrength',
-	        value: function setStrength(value) {
-	            this._pass.uniforms.strength.value = value;
-	            this._pass.uniforms.strength.needsUpdate = true;
+	    }]);
+
+	    return RgbShift;
+	}();
+
+	exports.default = RgbShift;
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _three = __webpack_require__(2);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * @author Felix Turner / www.airtight.cc / @felixturner
+	 *
+	 * Bad TV Shader
+	 * Simulates a bad TV via horizontal distortion and vertical roll
+	 * Uses Ashima WebGl Noise: https://github.com/ashima/webgl-noise
+	 *
+	 * Uniforms:
+	 * time: steadily increasing float passed in
+	 * distortion: amount of thick distortion
+	 * distortion2: amount of fine grain distortion
+	 * speed: distortion vertical travel speed
+	 * rollSpeed: vertical roll speed
+	 * 
+	 * The MIT License
+	 * 
+	 * Copyright (c) Felix Turner
+	 * 
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 * 
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 * 
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 * 
+	 */
+
+	var BadTVShader = {
+	    uniforms: {
+	        "tDiffuse": { type: "t", value: null },
+	        "time": { type: "f", value: 0.0 },
+	        "distortion": { type: "f", value: 3.0 },
+	        "distortion2": { type: "f", value: 5.0 },
+	        "speed": { type: "f", value: 0.2 },
+	        "rollSpeed": { type: "f", value: 0.1 }
+	    },
+
+	    vertexShader: __webpack_require__(6),
+
+	    fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float time;", "uniform float distortion;", "uniform float distortion2;", "uniform float speed;", "uniform float rollSpeed;", "varying vec2 vUv;",
+
+	    // Start Ashima 2D Simplex Noise
+
+	    "vec3 mod289(vec3 x) {", "  return x - floor(x * (1.0 / 289.0)) * 289.0;", "}", "vec2 mod289(vec2 x) {", "  return x - floor(x * (1.0 / 289.0)) * 289.0;", "}", "vec3 permute(vec3 x) {", "  return mod289(((x*34.0)+1.0)*x);", "}", "float snoise(vec2 v)", "  {", "  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0", "                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)", "                     -0.577350269189626,  // -1.0 + 2.0 * C.x", "                      0.024390243902439); // 1.0 / 41.0", "  vec2 i  = floor(v + dot(v, C.yy) );", "  vec2 x0 = v -   i + dot(i, C.xx);", "  vec2 i1;", "  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);", "  vec4 x12 = x0.xyxy + C.xxzz;", " x12.xy -= i1;", "  i = mod289(i); // Avoid truncation effects in permutation", "  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))", "		+ i.x + vec3(0.0, i1.x, 1.0 ));", "  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);", "  m = m*m ;", "  m = m*m ;", "  vec3 x = 2.0 * fract(p * C.www) - 1.0;", "  vec3 h = abs(x) - 0.5;", "  vec3 ox = floor(x + 0.5);", "  vec3 a0 = x - ox;", "  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );", "  vec3 g;", "  g.x  = a0.x  * x0.x  + h.x  * x0.y;", "  g.yz = a0.yz * x12.xz + h.yz * x12.yw;", "  return 130.0 * dot(m, g);", "}",
+
+	    // End Ashima 2D Simplex Noise
+
+	    "void main() {", "vec2 p = vUv;", "float ty = time*speed;", "float yt = p.y - ty;",
+	    //smooth distortion
+	    "float offset = snoise(vec2(yt*3.0,0.0))*0.2;",
+	    // boost distortion
+	    "offset = offset*distortion * offset*distortion * offset;",
+	    //add fine grain distortion
+	    "offset += snoise(vec2(yt*50.0,0.0))*distortion2*0.001;",
+	    //combine distortion on X with roll on Y
+	    "gl_FragColor = texture2D(tDiffuse,  vec2(fract(p.x + offset),fract(p.y-time*rollSpeed) ));", "}"].join("\n")
+
+	};
+
+	var TvEffect = function () {
+	    function TvEffect() {
+	        _classCallCheck(this, TvEffect);
+
+	        var shader = BadTVShader;
+	        shader.uniforms.rollSpeed.value = 0;
+	        shader.uniforms.rollSpeed.needsUpdate = true;
+
+	        shader.uniforms.speed.value = 0.2;
+	        shader.uniforms.speed.needsUpdate = true;
+
+	        shader.uniforms.distortion.value = 3;
+	        shader.uniforms.distortion.needsUpdate = true;
+	        shader.uniforms.distortion2.value = 5;
+	        shader.uniforms.distortion2.needsUpdate = true;
+
+	        this._pass = new _three2.default.ShaderPass(shader);
+	    }
+
+	    _createClass(TvEffect, [{
+	        key: "getPasses",
+	        value: function getPasses(composer) {
+	            return [this._pass];
 	        }
 	    }, {
-	        key: 'setColors',
-	        value: function setColors(replacements) {
-	            var i = 0;
-	            var _iteratorNormalCompletion = true;
-	            var _didIteratorError = false;
-	            var _iteratorError = undefined;
+	        key: "update",
+	        value: function update(time) {
+	            this._pass.uniforms.time.value = time / 1000;
+	            this._pass.uniforms.time.needsUpdate = true;
+	        }
+	    }, {
+	        key: "setDistortion",
+	        value: function setDistortion(one, two) {
+	            this._pass.uniforms.distortion.value = one;
+	            this._pass.uniforms.distortion.needsUpdate = true;
 
-	            try {
-	                for (var _iterator = replacements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	                    var _step$value = _slicedToArray(_step.value, 3);
-
-	                    var tolerance = _step$value[0];
-	                    var target = _step$value[1];
-	                    var replacement = _step$value[2];
-
-	                    this._pass.uniforms.tolerance.value[i] = tolerance;
-	                    this._pass.uniforms.targetColors.value[i] = target;
-	                    this._pass.uniforms.replacementColors.value[i] = replacement;
-	                    ++i;
-	                }
-	            } catch (err) {
-	                _didIteratorError = true;
-	                _iteratorError = err;
-	            } finally {
-	                try {
-	                    if (!_iteratorNormalCompletion && _iterator.return) {
-	                        _iterator.return();
-	                    }
-	                } finally {
-	                    if (_didIteratorError) {
-	                        throw _iteratorError;
-	                    }
-	                }
-	            }
-
-	            this._pass.uniforms.targetColors.needsUpdate = true;
-	            this._pass.uniforms.replacementColors.needsUpdate = true;
+	            this._pass.uniforms.distortion2.value = two;
+	            this._pass.uniforms.distortion2.needsUpdate = true;
 	        }
 	    }]);
 
-	    return SelectiveColor;
+	    return TvEffect;
 	}();
 
-	exports.default = SelectiveColor;
+	exports.default = TvEffect;
+
+/***/ },
+/* 24 */,
+/* 25 */,
+/* 26 */,
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _three = __webpack_require__(2);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var shader = {
+	    uniforms: {
+	        tDiffuse: { type: 'tDiffuse', value: null },
+	        amount: { type: 'f', value: 0.5 },
+	        multiplier: { type: 'f', value: 1 }
+
+	    },
+	    vertexShader: __webpack_require__(6),
+	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float amount;\n        uniform float multiplier;\n\n        varying vec2 vUv;\n\n        float luminance(vec3 rgb) {\n            const vec3 W = vec3(0.2125, 0.7154, 0.0721);\n            return dot(rgb, W);\n        }\n\n        void main() {\n            vec4 tex = texture2D(tDiffuse, vUv);\n            vec3 sample = tex.rgb;\n            float std = min(amount, (1.0 - amount));\n            float score = (luminance(tex.rgb) - amount) / std;\n            tex.rgb = (tex.rgb * exp2(score)) - tex.rgb;\n            tex *= multiplier;\n            gl_FragColor = vec4(tex.rgb + sample, tex.a);\n        }\n    '
+	};
+
+	var PosterEffect = function () {
+	    function PosterEffect() {
+	        _classCallCheck(this, PosterEffect);
+
+	        this._pass = new _three2.default.ShaderPass(shader);
+	    }
+
+	    _createClass(PosterEffect, [{
+	        key: 'getPasses',
+	        value: function getPasses() {
+	            return [this._pass];
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update(time) {
+	            /* noop */
+	        }
+	    }]);
+
+	    return PosterEffect;
+	}();
+
+	exports.default = PosterEffect;
 
 /***/ }
 /******/ ]);

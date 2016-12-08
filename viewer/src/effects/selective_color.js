@@ -12,7 +12,7 @@ const repeat = (x, times) => {
 const shader = {
     uniforms: {
         tDiffuse: { type: 't', value: null },
-        saturation: { type: 'f', value: 1.0 },
+        saturation: { type: 'f', value: 0.9 },
         tolerance: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
         strength: { type: 'f', value: 0.4 },
         targetColors: { type: 'v3v', value: repeat(new THREE.Vector3(-100, -100, -100), ARRAY_SIZE) },

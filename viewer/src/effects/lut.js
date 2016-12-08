@@ -25,9 +25,7 @@ export default class Lut {
     }
 
     getPasses() {
-        return [
-            this._pass
-        ]
+        return [this._pass]
     }
 
     setStrength(value) {
