@@ -20,7 +20,9 @@ module.exports = {
                 query: {
                     presets: ['es2015']
                 }
-            }
+            },
+            { test: /\.(glsl|frag|vert)$/, loader: 'raw' },
+            { test: /\.(glsl|frag|vert)$/, loader: 'glslify' }
         ]
     }
 };

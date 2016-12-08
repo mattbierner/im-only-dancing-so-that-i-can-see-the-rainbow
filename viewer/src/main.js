@@ -1,18 +1,13 @@
 import Renderer from './renderer'
 import { createPulseClient } from './pulse_client'
 import { viewerIp } from './config'
-import PulseSound from './audio/mp3'
 
 const renderer = new Renderer(
     document.getElementById('canvas3d'),
     document.getElementById('main'))
 
-const sound = new PulseSound()
-
-
 createPulseClient((data) => {
     renderer.pulse(data)
-    sound.pulse(data)
 })
 
 const loadStream = (number) => {

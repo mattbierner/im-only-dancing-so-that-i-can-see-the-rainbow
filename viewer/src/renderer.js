@@ -1,13 +1,13 @@
 import THREE from 'three'
 import Cmyk from './effects/cmyk'
-import Rgb from './effects/rgb'
+import Rgb from './experiences/wip'
 
 import CopyShader from 'imports?THREE=three!three/examples/js/shaders/CopyShader';
 import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing/EffectComposer'
 
+import TexturePass from 'imports?THREE=three!three/examples/js/postprocessing/TexturePass'
 import RenderPass from 'imports?THREE=three!three/examples/js/postprocessing/RenderPass'
 import ShaderPass from 'imports?THREE=three!three/examples/js/postprocessing/ShaderPass'
-
 
 const canvas2d = document.getElementById('canvas2d')
 
@@ -18,45 +18,39 @@ const nearestPowerOfTwo = dim => {
     return power
 }
 
+export class Eye {
+    constructor(stream, renderer, effect) {
+        this.stream = stream;
 
+        const [canvas, ctx] = this._createCanvas(stream)
+        this._canvas = canvas
+        this._ctx = ctx
 
-export default class Renderer {
-    constructor(canvas, container) {
-        this._container = container
-        this._clock = new THREE.Clock()
-        this._lastMs = 0
+        this.map = new THREE.Texture(this._canvas)
+        this._target = new THREE.WebGLRenderTarget(stream.width, stream.height, {depthBuffer: false, stencilBuffer: false})
+        this._composer = new THREE.EffectComposer(renderer, this._target)
+        this._inputPass = new THREE.TexturePass(this.map);
+        this._composer.addPass(this._inputPass)
+       // this._inputPass.renderToScreen = true;
 
-        this._scene = new THREE.Scene()
-        this._s2 = new Rgb();
-
-        this._initRenderer(canvas)
-        this._initCamera()
-        this._initComposer()
-        this._onResize()
-
-        window.addEventListener('resize', () => this._onResize(), false)
-    }
-
-    pulse(data) {
-        this._s2.push(data)
-    }
-
-    setImage(left, right) {
-        this._streamLeft = left
-        this._streamRight = right
-
-        const [canvasLeft, ctxLeft] = this._createCanvas(left)
-        this._canvasLeft = canvasLeft
-        this._ctxLeft = ctxLeft
-
-        if (right) {
-            const [canvasRight, ctxRight] = this._createCanvas(right)
-            this._canvasRight = canvasRight
-            this._ctxRight = ctxRight
+        for (const p of effect.getPasses()) {
+            this._composer.addPass(p)
         }
 
-        this._initMaterials()
-        this._initGeometry()
+        const c = new THREE.ShaderPass(THREE.CopyShader)
+        this._composer.addPass(c)
+    }
+
+    getTexture() {
+        return this._target.texture
+    }
+
+    update() {
+        this._ctx.drawImage(this.stream, 0, 0, this._canvas.width, this._canvas.height)
+        this.map.needsUpdate = true
+        this._inputPass.needsUpdate = true
+        this._inputPass.uniforms.tDiffuse.needsUpdate = true;
+        this._composer.render()
     }
 
     _createCanvas(img) {
@@ -69,9 +63,37 @@ export default class Renderer {
         ctx.scale(-1, -1)
         return [canvas, ctx]
     }
+}
+
+export default class Renderer {
+    constructor(canvas, container) {
+        this._container = container
+        this._clock = new THREE.Clock()
+        this._lastMs = 0
+
+        this._scene = new THREE.Scene()
+        this._effect = new Rgb();
+
+        this._initRenderer(canvas)
+        this._initCamera()
+        this._initComposer()
+        this._onResize()
+
+        window.addEventListener('resize', () => this._onResize(), false)
+    }
+
+    pulse(data) {
+        this._effect.push(data)
+    }
+
+    setImage(left, right) {
+        this.leftEye = new Eye(left, this._renderer, this._effect)
+        this.rightEye = right ? new Eye(right, this._renderer, this._effect) : this.leftEye
+        this._initGeometry()
+    }
 
     _initRenderer(canvas) {
-        this._renderer = new THREE.WebGLRenderer({ canvas: canvas })
+        this._renderer = new THREE.WebGLRenderer({ canvas: canvas, preserveDrawingBuffer: true, depthBuffer: false, })
         this._renderer.setClearColor(0x000000)
     }
 
@@ -87,33 +109,22 @@ export default class Renderer {
     _initComposer() {
         this._composer = new THREE.EffectComposer(this._renderer);
         const r1 = new THREE.RenderPass(this._scene, this._camera)
+        r1.renderToScreen = true;
         this._composer.addPass(r1)
 
-        this._composer.addPass(this._s2.pass)
-        this._s2.pass.renderToScreen = true
-    }
-
-    _initMaterials() {
-        this._mapLeft = new THREE.Texture(this._canvasLeft)
-        this._materialLeft = new THREE.MeshBasicMaterial({ map: this._mapLeft })
-
-        if (this._canvasRight) {
-            this._mapRight = new THREE.Texture(this._canvasRight)
-        } else {
-            this._mapRight = this._mapLeft
-        }
-        this._materialRight = new THREE.MeshBasicMaterial({ map: this._mapRight })
     }
 
     _initGeometry() {
         // Poor mans webvr :)
         const geometry = new THREE.PlaneGeometry(1, 2);
 
-        this._left = new THREE.Mesh(geometry, this._materialLeft)
+        this._leftMaterial = new THREE.MeshBasicMaterial({ map: this.leftEye.getTexture() })
+        this._left = new THREE.Mesh(geometry, this._leftMaterial)
         this._left.position.setX(-0.5)
         this._scene.add(this._left)
 
-        this._right = new THREE.Mesh(geometry, this._materialRight)
+        this._rightMaterial = new THREE.MeshBasicMaterial({ map: this.rightEye.getTexture() })
+        this._right = new THREE.Mesh(geometry, this._rightMaterial)
         this._right.position.setX(0.5)
         this._scene.add(this._right)
     }
@@ -142,22 +153,21 @@ export default class Renderer {
         requestAnimationFrame(() => this.animate())
 
         // Update image
-        this._ctxLeft.drawImage(this._streamLeft, 0, 0, this._canvasLeft.width, this._canvasLeft.height)
-        this._mapLeft.needsUpdate = true
-        this._materialLeft.needsUpdate = true
+        this._effect.update(startMs)
 
-        if (this._ctxRight) {
-            this._ctxRight.drawImage(this._streamRight, 0, 0, this._canvasRight.width, this._canvasRight.height)
+        this.leftEye.update(startMs)
+        if (this.rightEye !== this.leftEye) {
+           // this.rightEye.update(startMs)
         }
-        
-        this._mapRight.needsUpdate = true
-        this._materialRight.needsUpdate = true
 
-        this._s2.update()
+        this._leftMaterial.needsUpdate = true
+        this._rightMaterial.needsUpdate = true
+        
+
         this._render()
     }
 
     _render() {
-        this._composer.render()
+        this._composer.render();
     }
 }

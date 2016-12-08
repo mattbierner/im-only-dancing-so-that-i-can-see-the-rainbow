@@ -1,20 +1,12 @@
 import THREE from 'three'
 import BaseColorEffect from './color_base'
 
-
-const shader =  {
+const shader = {
     uniforms: {
         map: { type: 't', value: new THREE.Texture() },
         weights: { type: 'v3', value: new THREE.Vector3(0, 0, 0) },
     },
-    vertexShader: `
-        varying vec2 vUv;
-        
-        void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-    `,
+    vertexShader: require('./standard.vert'),
     fragmentShader: `
         uniform sampler2D map;
         uniform vec3 weights;
@@ -30,7 +22,7 @@ const shader =  {
             gl_FragColor = vec4(color, 1.0);
         }
     `,
-};
+}
 
 export default class Rgb extends BaseColorEffect {
     constructor() {

@@ -4,12 +4,12 @@ import Collector from '../collector'
 /**
  */
 export default class Mp3Sound {
-    constructor() {
+    constructor(audioFile) {
         this._state = new Collector(0.995)
         this._playing = false
 
         const req = new XMLHttpRequest()
-        req.open('GET', './resources/maniac.mp3', true)
+        req.open('GET', audioFile, true)
         req.responseType = 'arraybuffer'
         req.onload = () =>
             audio_context.then(ctx => {

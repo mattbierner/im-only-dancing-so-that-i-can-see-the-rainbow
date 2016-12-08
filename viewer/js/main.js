@@ -50,23 +50,16 @@
 
 	var _renderer2 = _interopRequireDefault(_renderer);
 
-	var _pulse_client = __webpack_require__(13);
+	var _pulse_client = __webpack_require__(11);
 
-	var _config = __webpack_require__(14);
-
-	var _mp = __webpack_require__(18);
-
-	var _mp2 = _interopRequireDefault(_mp);
+	var _config = __webpack_require__(12);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var renderer = new _renderer2.default(document.getElementById('canvas3d'), document.getElementById('main'));
 
-	var sound = new _mp2.default();
-
 	(0, _pulse_client.createPulseClient)(function (data) {
 	    renderer.pulse(data);
-	    sound.pulse(data);
 	});
 
 	var loadStream = function loadStream(number) {
@@ -102,6 +95,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.Eye = undefined;
 
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
@@ -115,23 +109,27 @@
 
 	var _cmyk2 = _interopRequireDefault(_cmyk);
 
-	var _rgb = __webpack_require__(7);
+	var _wip = __webpack_require__(29);
 
-	var _rgb2 = _interopRequireDefault(_rgb);
+	var _wip2 = _interopRequireDefault(_wip);
 
-	var _CopyShader = __webpack_require__(9);
+	var _CopyShader = __webpack_require__(6);
 
 	var _CopyShader2 = _interopRequireDefault(_CopyShader);
 
-	var _EffectComposer = __webpack_require__(10);
+	var _EffectComposer = __webpack_require__(7);
 
 	var _EffectComposer2 = _interopRequireDefault(_EffectComposer);
 
-	var _RenderPass = __webpack_require__(11);
+	var _TexturePass = __webpack_require__(8);
+
+	var _TexturePass2 = _interopRequireDefault(_TexturePass);
+
+	var _RenderPass = __webpack_require__(9);
 
 	var _RenderPass2 = _interopRequireDefault(_RenderPass);
 
-	var _ShaderPass = __webpack_require__(12);
+	var _ShaderPass = __webpack_require__(10);
 
 	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
 
@@ -148,6 +146,89 @@
 	    }return power;
 	};
 
+	var Eye = exports.Eye = function () {
+	    function Eye(stream, renderer, effect) {
+	        _classCallCheck(this, Eye);
+
+	        this.stream = stream;
+
+	        var _createCanvas2 = this._createCanvas(stream);
+
+	        var _createCanvas3 = _slicedToArray(_createCanvas2, 2);
+
+	        var canvas = _createCanvas3[0];
+	        var ctx = _createCanvas3[1];
+
+	        this._canvas = canvas;
+	        this._ctx = ctx;
+
+	        this.map = new _three2.default.Texture(this._canvas);
+	        this._target = new _three2.default.WebGLRenderTarget(stream.width, stream.height, { depthBuffer: false, stencilBuffer: false });
+	        this._composer = new _three2.default.EffectComposer(renderer, this._target);
+	        this._inputPass = new _three2.default.TexturePass(this.map);
+	        this._composer.addPass(this._inputPass);
+	        // this._inputPass.renderToScreen = true;
+
+	        var _iteratorNormalCompletion = true;
+	        var _didIteratorError = false;
+	        var _iteratorError = undefined;
+
+	        try {
+	            for (var _iterator = effect.getPasses()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                var p = _step.value;
+
+	                this._composer.addPass(p);
+	            }
+	        } catch (err) {
+	            _didIteratorError = true;
+	            _iteratorError = err;
+	        } finally {
+	            try {
+	                if (!_iteratorNormalCompletion && _iterator.return) {
+	                    _iterator.return();
+	                }
+	            } finally {
+	                if (_didIteratorError) {
+	                    throw _iteratorError;
+	                }
+	            }
+	        }
+
+	        var c = new _three2.default.ShaderPass(_three2.default.CopyShader);
+	        this._composer.addPass(c);
+	    }
+
+	    _createClass(Eye, [{
+	        key: 'getTexture',
+	        value: function getTexture() {
+	            return this._target.texture;
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update() {
+	            this._ctx.drawImage(this.stream, 0, 0, this._canvas.width, this._canvas.height);
+	            this.map.needsUpdate = true;
+	            this._inputPass.needsUpdate = true;
+	            this._inputPass.uniforms.tDiffuse.needsUpdate = true;
+	            this._composer.render();
+	        }
+	    }, {
+	        key: '_createCanvas',
+	        value: function _createCanvas(img) {
+	            var canvas = document.createElement('canvas');
+	            canvas.width = nearestPowerOfTwo(img.width);
+	            canvas.height = nearestPowerOfTwo(img.height);
+
+	            var ctx = canvas.getContext('2d');
+	            ctx.translate(canvas.width, canvas.height);
+	            ctx.scale(-1, -1);
+	            return [canvas, ctx];
+	        }
+	    }]);
+
+	    return Eye;
+	}();
+
 	var Renderer = function () {
 	    function Renderer(canvas, container) {
 	        var _this = this;
@@ -159,7 +240,7 @@
 	        this._lastMs = 0;
 
 	        this._scene = new _three2.default.Scene();
-	        this._s2 = new _rgb2.default();
+	        this._effect = new _wip2.default();
 
 	        this._initRenderer(canvas);
 	        this._initCamera();
@@ -174,55 +255,19 @@
 	    _createClass(Renderer, [{
 	        key: 'pulse',
 	        value: function pulse(data) {
-	            this._s2.push(data);
+	            this._effect.push(data);
 	        }
 	    }, {
 	        key: 'setImage',
 	        value: function setImage(left, right) {
-	            this._streamLeft = left;
-	            this._streamRight = right;
-
-	            var _createCanvas2 = this._createCanvas(left);
-
-	            var _createCanvas3 = _slicedToArray(_createCanvas2, 2);
-
-	            var canvasLeft = _createCanvas3[0];
-	            var ctxLeft = _createCanvas3[1];
-
-	            this._canvasLeft = canvasLeft;
-	            this._ctxLeft = ctxLeft;
-
-	            if (right) {
-	                var _createCanvas4 = this._createCanvas(right);
-
-	                var _createCanvas5 = _slicedToArray(_createCanvas4, 2);
-
-	                var canvasRight = _createCanvas5[0];
-	                var ctxRight = _createCanvas5[1];
-
-	                this._canvasRight = canvasRight;
-	                this._ctxRight = ctxRight;
-	            }
-
-	            this._initMaterials();
+	            this.leftEye = new Eye(left, this._renderer, this._effect);
+	            this.rightEye = right ? new Eye(right, this._renderer, this._effect) : this.leftEye;
 	            this._initGeometry();
-	        }
-	    }, {
-	        key: '_createCanvas',
-	        value: function _createCanvas(img) {
-	            var canvas = document.createElement('canvas');
-	            canvas.width = nearestPowerOfTwo(img.width);
-	            canvas.height = nearestPowerOfTwo(img.height);
-
-	            var ctx = canvas.getContext('2d');
-	            ctx.translate(canvas.width, canvas.height);
-	            ctx.scale(-1, -1);
-	            return [canvas, ctx];
 	        }
 	    }, {
 	        key: '_initRenderer',
 	        value: function _initRenderer(canvas) {
-	            this._renderer = new _three2.default.WebGLRenderer({ canvas: canvas });
+	            this._renderer = new _three2.default.WebGLRenderer({ canvas: canvas, preserveDrawingBuffer: true, depthBuffer: false });
 	            this._renderer.setClearColor(0x000000);
 	        }
 	    }, {
@@ -242,23 +287,8 @@
 	        value: function _initComposer() {
 	            this._composer = new _three2.default.EffectComposer(this._renderer);
 	            var r1 = new _three2.default.RenderPass(this._scene, this._camera);
+	            r1.renderToScreen = true;
 	            this._composer.addPass(r1);
-
-	            this._composer.addPass(this._s2.pass);
-	            this._s2.pass.renderToScreen = true;
-	        }
-	    }, {
-	        key: '_initMaterials',
-	        value: function _initMaterials() {
-	            this._mapLeft = new _three2.default.Texture(this._canvasLeft);
-	            this._materialLeft = new _three2.default.MeshBasicMaterial({ map: this._mapLeft });
-
-	            if (this._canvasRight) {
-	                this._mapRight = new _three2.default.Texture(this._canvasRight);
-	            } else {
-	                this._mapRight = this._mapLeft;
-	            }
-	            this._materialRight = new _three2.default.MeshBasicMaterial({ map: this._mapRight });
 	        }
 	    }, {
 	        key: '_initGeometry',
@@ -266,11 +296,13 @@
 	            // Poor mans webvr :)
 	            var geometry = new _three2.default.PlaneGeometry(1, 2);
 
-	            this._left = new _three2.default.Mesh(geometry, this._materialLeft);
+	            this._leftMaterial = new _three2.default.MeshBasicMaterial({ map: this.leftEye.getTexture() });
+	            this._left = new _three2.default.Mesh(geometry, this._leftMaterial);
 	            this._left.position.setX(-0.5);
 	            this._scene.add(this._left);
 
-	            this._right = new _three2.default.Mesh(geometry, this._materialRight);
+	            this._rightMaterial = new _three2.default.MeshBasicMaterial({ map: this.rightEye.getTexture() });
+	            this._right = new _three2.default.Mesh(geometry, this._rightMaterial);
 	            this._right.position.setX(0.5);
 	            this._scene.add(this._right);
 	        }
@@ -306,18 +338,16 @@
 	            });
 
 	            // Update image
-	            this._ctxLeft.drawImage(this._streamLeft, 0, 0, this._canvasLeft.width, this._canvasLeft.height);
-	            this._mapLeft.needsUpdate = true;
-	            this._materialLeft.needsUpdate = true;
+	            this._effect.update(startMs);
 
-	            if (this._ctxRight) {
-	                this._ctxRight.drawImage(this._streamRight, 0, 0, this._canvasRight.width, this._canvasRight.height);
+	            this.leftEye.update(startMs);
+	            if (this.rightEye !== this.leftEye) {
+	                // this.rightEye.update(startMs)
 	            }
 
-	            this._mapRight.needsUpdate = true;
-	            this._materialRight.needsUpdate = true;
+	            this._leftMaterial.needsUpdate = true;
+	            this._rightMaterial.needsUpdate = true;
 
-	            this._s2.update();
 	            this._render();
 	        }
 	    }, {
@@ -3633,7 +3663,7 @@
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _color_base = __webpack_require__(5);
+	var _color_base = __webpack_require__(4);
 
 	var _color_base2 = _interopRequireDefault(_color_base);
 
@@ -3650,7 +3680,7 @@
 	        map: { type: 't', value: new _three2.default.Texture() },
 	        weights: { type: 'v3', value: new _three2.default.Vector3(0, 0, 0) }
 	    },
-	    vertexShader: '\n        varying vec2 vUv;\n        \n        void main() {\n            vUv = uv;\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n        }\n    ',
+	    vertexShader: __webpack_require__(22),
 	    fragmentShader: '\n        uniform sampler2D map;\n        uniform vec3 weights;\n\n        varying vec2 vUv;\n\n        vec4 rgbToCmyk(vec3 rgb) {\n            float k = min(1.0 - rgb.r, min(1.0 - rgb.g, 1.0 - rgb.b));\n            return vec4((1.0 - rgb - k) / (1.0 - k), k);\n        }\n\n        vec3 cmykToRgb(vec4 cmyk) { \n            return 1.0 - min(vec3(1.0), cmyk.xyz * ( 1.0 - cmyk.w ) + cmyk.w);\n        }\n\n        void main() {\n            vec4 tex = texture2D(map, vUv);\n            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);\n\n            vec4 cmyk = rgbToCmyk(tex.rgb);\n            vec4 graycmyk = rgbToCmyk(gray);\n\n            vec4 color = graycmyk + max(cmyk - graycmyk, 0.0) * vec4(weights, 1.0);\n\n            gl_FragColor = vec4(cmykToRgb(color), tex.w);\n        }\n    '
 	};
 
@@ -3669,8 +3699,7 @@
 	exports.default = Cmyk;
 
 /***/ },
-/* 4 */,
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3685,7 +3714,7 @@
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _collector = __webpack_require__(6);
+	var _collector = __webpack_require__(5);
 
 	var _collector2 = _interopRequireDefault(_collector);
 
@@ -3732,7 +3761,7 @@
 	exports.default = BaseColorEffect;
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3855,57 +3884,7 @@
 	exports.default = Collector;
 
 /***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _three = __webpack_require__(2);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	var _color_base = __webpack_require__(5);
-
-	var _color_base2 = _interopRequireDefault(_color_base);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var shader = {
-	    uniforms: {
-	        map: { type: 't', value: new _three2.default.Texture() },
-	        weights: { type: 'v3', value: new _three2.default.Vector3(0, 0, 0) }
-	    },
-	    vertexShader: '\n        varying vec2 vUv;\n        \n        void main() {\n            vUv = uv;\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n        }\n    ',
-	    fragmentShader: '\n        uniform sampler2D map;\n        uniform vec3 weights;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 tex = texture2D(map, vUv);\n            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);\n\n            vec3 color = gray + max(tex.rgb - gray, 0.0) * weights;\n\n            gl_FragColor = vec4(color, 1.0);\n        }\n    '
-	};
-
-	var Rgb = function (_BaseColorEffect) {
-	    _inherits(Rgb, _BaseColorEffect);
-
-	    function Rgb() {
-	        _classCallCheck(this, Rgb);
-
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Rgb).call(this, shader));
-	    }
-
-	    return Rgb;
-	}(_color_base2.default);
-
-	exports.default = Rgb;
-
-/***/ },
-/* 8 */,
-/* 9 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -3936,7 +3915,7 @@
 
 
 /***/ },
-/* 10 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -4104,7 +4083,64 @@
 
 
 /***/ },
-/* 11 */
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*** IMPORTS FROM imports-loader ***/
+	var THREE = __webpack_require__(2);
+
+	"use strict";
+
+	/**
+	 * @author alteredq / http://alteredqualia.com/
+	 */
+
+	THREE.TexturePass = function (texture, opacity) {
+
+		THREE.Pass.call(this);
+
+		if (THREE.CopyShader === undefined) console.error("THREE.TexturePass relies on THREE.CopyShader");
+
+		var shader = THREE.CopyShader;
+
+		this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+
+		this.uniforms["opacity"].value = opacity !== undefined ? opacity : 1.0;
+		this.uniforms["tDiffuse"].value = texture;
+
+		this.material = new THREE.ShaderMaterial({
+
+			uniforms: this.uniforms,
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader
+
+		});
+
+		this.needsSwap = false;
+
+		this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+		this.scene = new THREE.Scene();
+
+		this.quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), null);
+		this.scene.add(this.quad);
+	};
+
+	THREE.TexturePass.prototype = Object.assign(Object.create(THREE.Pass.prototype), {
+
+		constructor: THREE.TexturePass,
+
+		render: function render(renderer, writeBuffer, readBuffer, delta, maskActive) {
+
+			this.quad.material = this.material;
+
+			renderer.render(this.scene, this.camera, readBuffer, this.clear);
+		}
+
+	});
+
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -4164,7 +4200,7 @@
 
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
@@ -4234,7 +4270,7 @@
 
 
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4244,7 +4280,7 @@
 	});
 	exports.createPulseClient = undefined;
 
-	var _config = __webpack_require__(14);
+	var _config = __webpack_require__(12);
 
 	/**
 	 * 
@@ -4259,7 +4295,7 @@
 	};
 
 /***/ },
-/* 14 */
+/* 12 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4275,236 +4311,28 @@
 	var viewerIp = exports.viewerIp = ip;
 
 /***/ },
+/* 13 */,
+/* 14 */,
 /* 15 */,
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.init = undefined;
-
-	var _reverb = __webpack_require__(17);
-
-	var _reverb2 = _interopRequireDefault(_reverb);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var r = void 0;
-	var ctx = void 0;
-
-	exports.default = new Promise(function (resolve, reject) {
-	    r = resolve;
-	});
-
-	/**
-	 * For IOS, audio context can only be created inside of a touch event.
-	 */
-
-	var init = exports.init = function init() {
-	    if (ctx) return ctx;
-
-	    ctx = new (window.AudioContext || window.webkitAudioContext)();
-	    _reverb2.default.extend(ctx);
-	    var oscillator = ctx.createOscillator();
-	    oscillator.frequency.value = 1;
-	    oscillator.connect(ctx.destination);
-	    oscillator.start(0);
-	    oscillator.stop(0);
-	    r(ctx);
-	    return ctx;
-	};
-
-	var onIos = function onIos() {
-	    return (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-	    );
-	};
-
-	// The audio context must be created inside of a touch event on IOS
-	if (onIos()) {
-	    document.body.addEventListener('touchstart', function () {
-	        return init();
-	    }, false);
-	} else {
-	    init();
-	}
-
-/***/ },
-/* 17 */
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */
 /***/ function(module, exports) {
 
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/*global ArrayBuffer, Uint8Array, window, XMLHttpRequest*/
-	// from https://github.com/burnson/Reverb.js
-	exports.default = {
-	  extend: function extend(audioContext) {
-	    function decodeBase64ToArrayBuffer(input) {
-	      function encodedValue(input, index) {
-	        var encodedCharacter,
-	            x = input.charCodeAt(index);
-	        if (index < input.length) {
-	          if (x >= 65 && x <= 90) {
-	            encodedCharacter = x - 65;
-	          } else if (x >= 97 && x <= 122) {
-	            encodedCharacter = x - 71;
-	          } else if (x >= 48 && x <= 57) {
-	            encodedCharacter = x + 4;
-	          } else if (x === 43) {
-	            encodedCharacter = 62;
-	          } else if (x === 47) {
-	            encodedCharacter = 63;
-	          } else if (x !== 61) {
-	            console.log('base64 encountered unexpected character code: ' + x);
-	          }
-	        }
-	        return encodedCharacter;
-	      }
-
-	      if (input.length === 0 || input.length % 4 > 0) {
-	        console.log('base64 encountered unexpected length: ' + input.length);
-	        return;
-	      }
-
-	      var padding = input.match(/[=]*$/)[0].length,
-	          decodedLength = input.length * 3 / 4 - padding,
-	          buffer = new ArrayBuffer(decodedLength),
-	          bufferView = new Uint8Array(buffer),
-	          encoded = [],
-	          d = 0,
-	          e = 0,
-	          i;
-
-	      while (d < decodedLength) {
-	        for (i = 0; i < 4; i += 1) {
-	          encoded[i] = encodedValue(input, e);
-	          e += 1;
-	        }
-	        bufferView[d] = encoded[0] * 4 + Math.floor(encoded[1] / 16);
-	        d += 1;
-	        if (d < decodedLength) {
-	          bufferView[d] = encoded[1] % 16 * 16 + Math.floor(encoded[2] / 4);
-	          d += 1;
-	        }
-	        if (d < decodedLength) {
-	          bufferView[d] = encoded[2] % 4 * 64 + encoded[3];
-	          d += 1;
-	        }
-	      }
-	      return buffer;
-	    }
-
-	    function decodeAndSetupBuffer(node, arrayBuffer, callback) {
-	      audioContext.decodeAudioData(arrayBuffer, function (audioBuffer) {
-	        console.log('Finished decoding audio data.');
-	        node.buffer = audioBuffer;
-	        if (typeof callback === "function" && audioBuffer !== null) {
-	          callback(node);
-	        }
-	      }, function (e) {
-	        console.log('Could not decode audio data: ' + e);
-	      });
-	    }
-
-	    audioContext.createReverbFromBase64 = function (audioBase64, callback) {
-	      var reverbNode = audioContext.createConvolver();
-	      decodeAndSetupBuffer(reverbNode, decodeBase64ToArrayBuffer(audioBase64), callback);
-	      return reverbNode;
-	    };
-
-	    audioContext.createSourceFromBase64 = function (audioBase64, callback) {
-	      var sourceNode = audioContext.createBufferSource();
-	      decodeAndSetupBuffer(sourceNode, decodeBase64ToArrayBuffer(audioBase64), callback);
-	      return sourceNode;
-	    };
-
-	    audioContext.createReverbFromUrl = function (audioUrl, callback) {
-	      console.log('Downloading impulse response from ' + audioUrl);
-	      var reverbNode = audioContext.createConvolver(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded impulse response');
-	          decodeAndSetupBuffer(reverbNode, request.response, callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.responseType = 'arraybuffer';
-	      request.send();
-	      return reverbNode;
-	    };
-
-	    audioContext.createSourceFromUrl = function (audioUrl, callback) {
-	      console.log('Downloading sound from ' + audioUrl);
-	      var sourceNode = audioContext.createBufferSource(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded sound');
-	          decodeAndSetupBuffer(sourceNode, request.response, callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.responseType = 'arraybuffer';
-	      request.send();
-	      return sourceNode;
-	    };
-
-	    audioContext.createReverbFromBase64Url = function (audioUrl, callback) {
-	      console.log('Downloading base64 impulse response from ' + audioUrl);
-	      var reverbNode = audioContext.createConvolver(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded impulse response');
-	          decodeAndSetupBuffer(reverbNode, decodeBase64ToArrayBuffer(request.response), callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.send();
-	      return reverbNode;
-	    };
-
-	    audioContext.createSourceFromBase64Url = function (audioUrl, callback) {
-	      console.log('Downloading base64 sound from ' + audioUrl);
-	      var sourceNode = audioContext.createBufferSource(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded sound');
-	          decodeAndSetupBuffer(sourceNode, decodeBase64ToArrayBuffer(request.response), callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.send();
-	      return sourceNode;
-	    };
-	  }
-	};
+	module.exports = "#define GLSLIFY 1\nvarying vec2 vUv;\n\nvoid main() {\n    vUv = uv;\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n}"
 
 /***/ },
-/* 18 */
+/* 23 */,
+/* 24 */,
+/* 25 */,
+/* 26 */,
+/* 27 */,
+/* 28 */,
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4515,90 +4343,178 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _audio_context = __webpack_require__(16);
+	var _three = __webpack_require__(2);
 
-	var _audio_context2 = _interopRequireDefault(_audio_context);
+	var _three2 = _interopRequireDefault(_three);
 
-	var _collector = __webpack_require__(6);
+	var _selective_color = __webpack_require__(31);
 
-	var _collector2 = _interopRequireDefault(_collector);
+	var _selective_color2 = _interopRequireDefault(_selective_color);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	/**
+	 * Rainbow immersion
 	 */
 
-	var Mp3Sound = function () {
-	    function Mp3Sound() {
-	        var _this = this;
+	var Rainbow = function () {
+	    function Rainbow() {
+	        _classCallCheck(this, Rainbow);
 
-	        _classCallCheck(this, Mp3Sound);
+	        this._selective = new _selective_color2.default([[0.3, new _three2.default.Vector3(1.0, 0.3, 0.3), new _three2.default.Vector3(1, 0, 0)],
+	        //[0.15, new THREE.Vector3(0.5, 0.6, .60), new THREE.Vector3(0, 1, 0)],
+	        [0.2, new _three2.default.Vector3(.3, 0.7, 0.9), new _three2.default.Vector3(0, 0, 1)]]);
+	        this._selective.setStrength(0.7);
 
-	        this._state = new _collector2.default(0.995);
-	        this._playing = false;
-
-	        var req = new XMLHttpRequest();
-	        req.open('GET', './resources/maniac.mp3', true);
-	        req.responseType = 'arraybuffer';
-	        req.onload = function () {
-	            return _audio_context2.default.then(function (ctx) {
-	                _this._ctx = ctx;
-	                _this._ctx.decodeAudioData(req.response, function (buffer) {
-	                    _this._init(ctx, buffer);
-	                }, console.error);
-	            });
-	        };
-	        req.send();
+	        this._effects = [this._selective];
 	    }
 
-	    _createClass(Mp3Sound, [{
-	        key: '_init',
-	        value: function _init(ctx, sound) {
-	            this._gain = ctx.createGain();
-	            this._gain.connect(ctx.destination);
-
-	            this._source = ctx.createBufferSource();
-	            this._source.buffer = sound;
-	            this._source.connect(this._gain);
+	    _createClass(Rainbow, [{
+	        key: 'getPasses',
+	        value: function getPasses(composer) {
+	            return [].concat.apply([], [].concat.apply([], this._effects.map(function (x) {
+	                return x.getPasses();
+	            })));
 	        }
 	    }, {
-	        key: 'pulse',
-	        value: function pulse(data) {
-	            if (!this._playing) this.play();
-
-	            this._state.push(data);
-	            if (!this._source) return;
-
-	            var SCALE = 1 / 3;
-
-	            var handsPercent = 0.7;
-	            var feetPercent = 0.3;
-
-	            var rate = this._source.playbackRate.value;
-	            rate = Math.min(this._state.right_hand.d * SCALE, 1) * handsPercent / 2 + Math.min(this._state.left_hand.d * SCALE, 1) * handsPercent / 2 + Math.min((this._state.left_leg.d / 2 + this._state.right_leg.d / 2) * SCALE, 1) * feetPercent;
-
-	            if (rate < 0.15) rate = 0;
-
-	            if (rate > 1.5) rate = 1.5;
-
-	            this._source.playbackRate.value = rate;
+	        key: 'push',
+	        value: function push(data) {
+	            //noop
 	        }
 	    }, {
-	        key: 'play',
-	        value: function play() {
-	            if (!this._ctx || !this._source || this._playing) return;
-
-	            this._source.start(0);
-	            this._playing = true;
+	        key: 'update',
+	        value: function update(time) {
+	            this._effects.forEach(function (p) {
+	                return p.update(time);
+	            });
 	        }
 	    }]);
 
-	    return Mp3Sound;
+	    return Rainbow;
 	}();
 
-	exports.default = Mp3Sound;
+	exports.default = Rainbow;
+
+/***/ },
+/* 30 */,
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _three = __webpack_require__(2);
+
+	var _three2 = _interopRequireDefault(_three);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var ARRAY_SIZE = 8;
+
+	var repeat = function repeat(x, times) {
+	    var out = [];
+	    for (var i = 0; i < times; ++i) {
+	        out.push(x);
+	    }return out;
+	};
+
+	var shader = {
+	    uniforms: {
+	        tDiffuse: { type: 't', value: null },
+	        saturation: { type: 'f', value: 1.0 },
+	        tolerance: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
+	        strength: { type: 'f', value: 0.4 },
+	        targetColors: { type: 'v3v', value: repeat(new _three2.default.Vector3(-100, -100, -100), ARRAY_SIZE) },
+	        replacementColors: { type: 'v3v', value: repeat(new _three2.default.Vector3(-100, -100, -100), ARRAY_SIZE) }
+	    },
+	    vertexShader: __webpack_require__(22),
+	    fragmentShader: '\n        #define SIZE ' + ARRAY_SIZE + '\n\n        uniform sampler2D tDiffuse;\n        uniform float saturation;\n        uniform float tolerance[SIZE];\n        uniform float strength;\n        uniform vec3 targetColors[SIZE];\n        uniform vec3 replacementColors[SIZE];\n\n        varying vec2 vUv;\n\n        float luminance(vec3 rgb) {\n            const vec3 W = vec3(0.2125, 0.7154, 0.0721);\n            return dot(rgb, W);\n        }\n\n        float max3(vec3 v) {\n            return max(max(v.x, v.y), v.z);\n        }\n\n        void main() {\n            vec4 tex = texture2D(tDiffuse, vUv);\n            vec3 gray = vec3(luminance(tex.rgb) * saturation);\n            vec3 result = gray;\n            for (int i = 0; i < SIZE; ++i) {\n                vec3 diff = abs(tex.rgb - targetColors[i]);\n                if (max3(diff) < tolerance[i]) {\n                    result = mix(result, replacementColors[i], strength);\n                    //result = mix(result, replacementColors[i], strength * (tolerance - max3(diff)));\n                }\n            }\n            gl_FragColor = vec4(result, tex.a);\n        }'
+	};
+
+	/**
+	 * Selects one color and replaces it with another solid color
+	 */
+
+	var SelectiveColor = function () {
+	    function SelectiveColor(replacements) {
+	        _classCallCheck(this, SelectiveColor);
+
+	        this._pass = new _three2.default.ShaderPass(shader);
+	        this.setColors(replacements);
+	    }
+
+	    _createClass(SelectiveColor, [{
+	        key: 'getPasses',
+	        value: function getPasses() {
+	            return [this._pass];
+	        }
+	    }, {
+	        key: 'update',
+	        value: function update(time) {
+	            /* noop */
+	        }
+	    }, {
+	        key: 'setStrength',
+	        value: function setStrength(value) {
+	            this._pass.uniforms.strength.value = value;
+	            this._pass.uniforms.strength.needsUpdate = true;
+	        }
+	    }, {
+	        key: 'setColors',
+	        value: function setColors(replacements) {
+	            var i = 0;
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = replacements[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var _step$value = _slicedToArray(_step.value, 3);
+
+	                    var tolerance = _step$value[0];
+	                    var target = _step$value[1];
+	                    var replacement = _step$value[2];
+
+	                    this._pass.uniforms.tolerance.value[i] = tolerance;
+	                    this._pass.uniforms.targetColors.value[i] = target;
+	                    this._pass.uniforms.replacementColors.value[i] = replacement;
+	                    ++i;
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+
+	            this._pass.uniforms.targetColors.needsUpdate = true;
+	            this._pass.uniforms.replacementColors.needsUpdate = true;
+	        }
+	    }]);
+
+	    return SelectiveColor;
+	}();
+
+	exports.default = SelectiveColor;
 
 /***/ }
 /******/ ]);
