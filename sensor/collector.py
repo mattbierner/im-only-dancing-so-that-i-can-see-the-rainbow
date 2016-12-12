@@ -10,17 +10,14 @@ from datetime import datetime
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
 
-EPOCH = datetime.utcfromtimestamp(0)
-
 SAMPLE_INTERVAL = 1 / 60 # sec
 
 WEBSOCKET_PORT = 5678
 
-# GPIO config
+# Spi config
 mcp0 = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(0, 0))
 mcp1 = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(0, 1))
 
-# Conf
 LEFT_HAND = {
     'channel': 1,
     'x_pin': 0,
@@ -49,9 +46,6 @@ RIGHT_LEG = {
     'z_pin': 7 
 }
 
-
-def readadc(pin):
-    return mcp.read_adc(pin)
 
 class Collector():
     def __init__(self):
