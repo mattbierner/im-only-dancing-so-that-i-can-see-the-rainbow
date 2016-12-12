@@ -54,6 +54,14 @@
 
 	var _config = __webpack_require__(14);
 
+	var config = _interopRequireWildcard(_config);
+
+	var _load_image = __webpack_require__(24);
+
+	var _load_image2 = _interopRequireDefault(_load_image);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var renderer = new _renderer2.default(document.getElementById('canvas3d'), document.getElementById('main'));
@@ -63,28 +71,17 @@
 	});
 
 	var loadStream = function loadStream(number) {
-	    var res = void 0;
-	    var p = new Promise(function (r) {
-	        res = r;
-	    });
-
-	    var img = new Image();
-	    img.crossOrigin = 'anonymous';
-	    img.onload = function () {
-	        res(img);
-	    };
-	    img.src = 'http://' + _config.viewerIp + ':1234/?action=stream_' + number; //"http://localhost:8000/image.jpg"
-	    return p;
+	    return (0, _load_image2.default)(config.viewerUrl + '?action=stream_' + number);
 	};
 
 	loadStream(0).then(function (img1) {
-	    //   loadStream(0).then(img2 => {
-	    renderer.setImage(img1);
-	    renderer.animate();
-	}
-	//)
-	).catch(function (x) {
-	    return console.error(x);
+	    var img2 = config.stereo ? loadStream(1) : Promise.resolve(undefined);
+	    return img2.then(function (img2) {
+	        renderer.setImage(img1, img2);
+	        renderer.animate();
+	    });
+	}).catch(function (x) {
+	    console.error(x);
 	});
 
 /***/ },
@@ -4654,6 +4651,39 @@
 	}(_base_experiance2.default);
 
 	exports.default = SixtiesWeed;
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 * Load an image
+	 */
+
+	exports.default = function (url) {
+	    var resolve = void 0;
+	    var reject = void 0;
+	    var p = new Promise(function (res, rej) {
+	        resolve = res;
+	        reject = rej;
+	    });
+
+	    var img = new Image();
+	    img.crossOrigin = 'anonymous';
+	    img.onload = function () {
+	        resol(img);
+	    };
+	    img.onerror = function () {
+	        reject(img);
+	    };
+	    img.src = url;
+	    return p;
+	};
 
 /***/ }
 /******/ ]);
