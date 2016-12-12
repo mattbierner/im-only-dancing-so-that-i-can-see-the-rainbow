@@ -1,6 +1,6 @@
 import THREE from 'three'
 import Cmyk from './effects/cmyk'
-import Rgb from './experiences/wip'
+import Rgb from './experiences/sixties_weed'
 
 import CopyShader from 'imports?THREE=three!three/examples/js/shaders/CopyShader';
 import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing/EffectComposer'
@@ -27,30 +27,17 @@ export class Eye {
         this._ctx = ctx
 
         this.map = new THREE.Texture(this._canvas)
-        this._target = new THREE.WebGLRenderTarget(stream.width, stream.height, {depthBuffer: false, stencilBuffer: false})
-        this._composer = new THREE.EffectComposer(renderer, this._target)
-        this._inputPass = new THREE.TexturePass(this.map);
-        this._composer.addPass(this._inputPass)
-       // this._inputPass.renderToScreen = true;
-
-        for (const p of effect.getPasses()) {
-            this._composer.addPass(p)
-        }
-
-        const c = new THREE.ShaderPass(THREE.CopyShader)
-        this._composer.addPass(c)
+        this._effect = effect.forComposer(renderer, this.map)
     }
 
     getTexture() {
-        return this._target.texture
+        return this._effect.getOutput()
     }
 
-    update() {
+    update(time, delta) {
         this._ctx.drawImage(this.stream, 0, 0, this._canvas.width, this._canvas.height)
         this.map.needsUpdate = true
-        this._inputPass.needsUpdate = true
-        this._inputPass.uniforms.tDiffuse.needsUpdate = true;
-        this._composer.render()
+        this._effect.render(time, delta)
     }
 
     _createCanvas(img) {
@@ -153,16 +140,16 @@ export default class Renderer {
         requestAnimationFrame(() => this.animate())
 
         // Update image
-        this._effect.update(startMs)
+        this._effect.update(startMs, deltaMs)
 
-        this.leftEye.update(startMs)
+        this.leftEye.update(startMs, deltaMs)
         if (this.rightEye !== this.leftEye) {
-           // this.rightEye.update(startMs)
+            // this.rightEye.update(startMs)
         }
 
         this._leftMaterial.needsUpdate = true
         this._rightMaterial.needsUpdate = true
-        
+
 
         this._render()
     }

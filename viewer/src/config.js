@@ -1,6 +1,14 @@
 /**
- * Hostname of Raspberry Pi streaming server.
+ * Hostname of Raspberry pi
  */
-export const ip = window.location.href.indexOf('phone') >= 0 ? '172.20.10.3' : 'sourdough.local';
+export const ip = window.location.href.indexOf('phone') >= 0 ? '172.20.10.3' : 'sourdough.local'
 
-export const viewerIp =  ip;
+/**
+ * Root url of the Raspberry Pi mjpeg streaming site.
+ */
+export const viewerUlr =  `http://${ip}:1234/`
+
+/**
+ * Should data from two cameras be collected?
+ */
+export const stereo = false

@@ -10,7 +10,7 @@ import Sound from '../audio/mp3'
  */
 export default class Neon {
     constructor() {
-        this._lut = new LutEffect('./resources/luts/lut_neon.png')
+        this._lut = new LutEffect('./resources/luts/neon.png')
         this._blur = new BlurEffect()
         this._tv = new TvEffect()
         this._rgbShift = new RgbShiftEffect()
@@ -26,7 +26,7 @@ export default class Neon {
     }
 
     getPasses(composer) {
-        return [].concat.apply([], [].concat.apply([], this._effects.map(x => x.getPasses())))
+        return [].concat.apply([], [].concat.apply([], this._effects.map(x => x.getPass())))
     }
 
     push(data) {

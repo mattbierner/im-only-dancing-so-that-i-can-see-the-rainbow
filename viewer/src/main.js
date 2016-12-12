@@ -12,7 +12,7 @@ createPulseClient((data) => {
 
 const loadStream = (number) => {
     let res;
-    const p = new Promise((r) => { res = r; })
+    const p = new Promise(r => { res = r; })
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -23,8 +23,10 @@ const loadStream = (number) => {
     return p;
 }
 
-loadStream(0).then(img1 =>
-    loadStream(1).then(img2 => {
+loadStream(0).then(img1 => {
+ //   loadStream(0).then(img2 => {
         renderer.setImage(img1)
         renderer.animate()
-    })).catch(x => console.error(x))
+    }
+    //)
+    ).catch(x => console.error(x))

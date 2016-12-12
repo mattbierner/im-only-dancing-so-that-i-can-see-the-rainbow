@@ -25,7 +25,7 @@ const shader = {
     `,
 };
 
-class Accumulator {
+export default class Accumulator {
     constructor(renderer, map) {
         this._passes = 4;
         this._i = 0
@@ -70,18 +70,5 @@ class Accumulator {
         this.miami.update(time)
         this.preRender()
         this._composer.render()
-    }
-}
-
-export default class Wip extends BaseExperiance {
-    constructor() {
-        super([])
-    }
-
-    forComposer(renderer, map) {
-        return new Accumulator(renderer, map)
-    }
-
-    update(time) {
     }
 }

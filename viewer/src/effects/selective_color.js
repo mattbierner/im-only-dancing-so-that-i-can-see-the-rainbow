@@ -1,13 +1,7 @@
 import THREE from 'three'
+import repeat from '../util/repeat'
 
 const ARRAY_SIZE = 8;
-
-const repeat = (x, times) => {
-    const out = [];
-    for (let i = 0; i < times; ++i)
-        out.push(x)
-    return out
-}
 
 const shader = {
     uniforms: {
@@ -64,8 +58,8 @@ export default class SelectiveColor {
         this.setColors(replacements)
     }
 
-    getPasses() {
-        return [this._pass]
+    getPass() {
+        return this._pass
     }
 
     update(time) {
@@ -76,8 +70,6 @@ export default class SelectiveColor {
         this._pass.uniforms.strength.value = value
         this._pass.uniforms.strength.needsUpdate = true
     }
-
-
 
     setColors(replacements) {
         let i = 0;

@@ -1,29 +1,21 @@
+import BaseExperinace from './_base_experiance'
 import LutEffect from '../effects/lut'
 import PulseBlurEffect from '../effects/pulse_blur'
 
-/**
- * Sixties weed
- */
-export default class SixtiesWeed {
+export default class SixtiesWeed extends BaseExperinace {
     constructor() {
-        this._pulse = new PulseBlurEffect()
-        this._lut = new LutEffect('./resources/luts/lut_miss_etikate.png')
+        super();
+
+        this._pulse = new PulseBlurEffect([
+            { strength: 1.0, speed: 0.00, amplitude: 0.00, sample: 0.000, offset: 0 },
+            { strength: 1.0, speed: 0.001, amplitude: 0.20, sample: 0.000, offset: 0 },
+        ])
+
+        this._lut = new LutEffect('./resources/luts/vintage1.png')
 
         this._effects = [
             this._lut,
             this._pulse
         ]
-    }
-
-    getPasses(composer) {
-        return [].concat.apply([], [].concat.apply([], this._effects.map(x => x.getPasses())))
-    }
-
-    push(data) {
-        // noop
-    }
-
-    update(time) {
-        this._effects.forEach(p => p.update(time))
     }
 }

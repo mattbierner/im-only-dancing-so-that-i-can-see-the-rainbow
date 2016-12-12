@@ -148,8 +148,8 @@ export default class TvEffect {
         this._pass = new THREE.ShaderPass(shader)
     }
 
-    getPasses(composer) {
-        return [this._pass]
+    getPass(composer) {
+        return this._pass
     }
 
     update(time) {

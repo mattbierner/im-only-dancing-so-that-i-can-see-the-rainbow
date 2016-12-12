@@ -19,7 +19,7 @@ export default class Rainbow {
     }
 
     getPasses(composer) {
-        return [].concat.apply([], [].concat.apply([], this._effects.map(x => x.getPasses())))
+        return [].concat.apply([], [].concat.apply([], this._effects.map(x => x.getPass())))
 
     }
 

@@ -41,8 +41,8 @@ export default class BlurEffect {
         this._pass = new THREE.ShaderPass(shader)
     }
 
-    getPasses() {
-        return [this._pass]
+    getPass() {
+        return this._pass
     }
 
     setStrength(value) {

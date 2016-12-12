@@ -21,16 +21,18 @@ const shader = {
     `,
 };
 
-export default class PosterEffect {
-    constructor() {
+export default class BloomEffet {
+    constructor(strength = 0.5) {
         this._pass = new THREE.ShaderPass(shader)
+        this.setStrength(strength);
     }
 
-    getPasses() {
-        return [this._pass]
+    getPass() {
+        return this._pass
     }
 
-     update(time) {
-        /* noop */
+    setStrength(value) {
+        this._pass.uniforms.strength.value = value
+        this._pass.uniforms.strength.needsUpdate = true
     }
 }
