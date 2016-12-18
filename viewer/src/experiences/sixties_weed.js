@@ -4,7 +4,7 @@ import PulseBlurEffect from '../effects/pulse_blur'
 
 export default class SixtiesWeed extends BaseExperinace {
     constructor() {
-        super();
+        super()
 
         this._pulse = new PulseBlurEffect([
             { strength: 1.0, speed: 0.00, amplitude: 0.00, sample: 0.000, offset: 0 },

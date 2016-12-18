@@ -10,5 +10,5 @@ varying vec2 vUv;
 
 void main() {
     vec4 tex = texture2D(tDiffuse, vUv);
-    gl_FragColor = mix(tex, transform(tex, table), strength);
+    gl_FragColor = mix(tex, transform(tex, table), clamp(strength, 0.0, 1.0));
 }

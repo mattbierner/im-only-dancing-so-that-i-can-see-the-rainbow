@@ -28,6 +28,9 @@ export default class Mp3Sound {
         this._source = ctx.createBufferSource()
         this._source.buffer = sound
         this._source.connect(this._gain)
+
+        if (this._playing)
+            this._source.start(0)
     }
 
     pulse(data) {
@@ -58,10 +61,13 @@ export default class Mp3Sound {
     }
 
     play() {
-        if (!this._ctx || !this._source || this._playing)
-            return;
-       
-        this._source.start(0)
+        if (this._playing)
+            return
+
         this._playing = true
+        if (!this._ctx || !this._source)
+            return
+        
+        this._source.start(0)
     }
 }

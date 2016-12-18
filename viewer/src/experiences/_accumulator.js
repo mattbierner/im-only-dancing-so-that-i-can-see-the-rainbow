@@ -1,6 +1,4 @@
 import THREE from 'three'
-import BaseExperiance from './_base_experiance'
-import miami from './miami'
 
 const shader = {
     uniforms: {
@@ -26,7 +24,7 @@ const shader = {
 };
 
 export default class Accumulator {
-    constructor(renderer, map) {
+    constructor(effect, renderer, map) {
         this._passes = 4;
         this._i = 0
         this._targets = []
@@ -43,8 +41,7 @@ export default class Accumulator {
         this._composer = new THREE.EffectComposer(renderer, this._target)
         this._inputPass = new THREE.ShaderPass(shader)
         this._composer.addPass(this._inputPass);
-        this.miami = new miami()
-        for (const p of this.miami.getPasses())
+        for (const p of effect.getPasses())
             this._composer.addPass(p)
         this._composer.addPass(new THREE.ShaderPass(THREE.CopyShader))
     }
@@ -67,7 +64,6 @@ export default class Accumulator {
     }
 
     render(time, delta) {
-        this.miami.update(time)
         this.preRender()
         this._composer.render()
     }

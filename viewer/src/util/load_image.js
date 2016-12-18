@@ -11,7 +11,7 @@ export default (url) => {
 
     const img = new Image()
     img.crossOrigin = 'anonymous'
-    img.onload = () => { resol(img) }
+    img.onload = () => { resolve(img) }
     img.onerror = () => { reject(img) }
     img.src = url
     return p

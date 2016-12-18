@@ -1,6 +1,6 @@
 import THREE from 'three'
 import Cmyk from './effects/cmyk'
-import Rgb from './experiences/sixties_weed'
+import Rgb from './experiences/rainbow'
 
 import CopyShader from 'imports?THREE=three!three/examples/js/shaders/CopyShader';
 import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing/EffectComposer'
@@ -134,17 +134,17 @@ export default class Renderer {
     }
 
     animate() {
-        const startMs = this._clock.getElapsedTime() * 1000
-        const deltaMs = this._clock.getDelta() * 1000
+        const delta = this._clock.getDelta()
+        const start = this._clock.getElapsedTime()
 
         requestAnimationFrame(() => this.animate())
 
         // Update image
-        this._effect.update(startMs, deltaMs)
+        this._effect.update(start, delta)
 
-        this.leftEye.update(startMs, deltaMs)
+        this.leftEye.update(start, delta)
         if (this.rightEye !== this.leftEye) {
-            // this.rightEye.update(startMs)
+             this.rightEye.update(startMs)
         }
 
         this._leftMaterial.needsUpdate = true
