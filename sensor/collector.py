@@ -80,7 +80,7 @@ async def handler(websocket, path):
                 print(data)
                 await websocket.send(data)
             elapsed = datetime.now() - start
-            await asyncio.sleep(max(0, elapsed.total_seconds() - SAMPLE_INTERVAL))
+            await asyncio.sleep(max(0, SAMPLE_INTERVAL - elapsed.total_seconds()))
     finally:
         await websocket.close()
 

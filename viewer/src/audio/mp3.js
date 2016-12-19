@@ -1,12 +1,11 @@
 import audio_context from './audio_context'
-import Collector from '../collector'
 
 /**
  */
 export default class Mp3Sound {
     constructor(audioFile) {
-        this._state = new Collector(0.995)
         this._playing = false
+        this._playbackRate = 1
 
         const req = new XMLHttpRequest()
         req.open('GET', audioFile, true)
@@ -26,6 +25,7 @@ export default class Mp3Sound {
         this._gain.connect(ctx.destination)
 
         this._source = ctx.createBufferSource()
+        this._source.playbackRate.value = this._playbackRate
         this._source.buffer = sound
         this._source.connect(this._gain)
 
@@ -33,30 +33,11 @@ export default class Mp3Sound {
             this._source.start(0)
     }
 
-    pulse(data) {
-        if (!this._playing)
-            this.play()
 
-        this._state.push(data)
+    setPlaybackRate(rate) {
+        this._playbackRate = rate
         if (!this._source)
             return
-
-        const SCALE = 1 / 3
-
-        const handsPercent = 0.7
-        const feetPercent = 0.3;
-
-        let rate = this._source.playbackRate.value
-        rate = Math.min(this._state.right_hand.d * SCALE, 1) * handsPercent / 2
-            + Math.min(this._state.left_hand.d * SCALE, 1) * handsPercent / 2
-            + Math.min((this._state.left_leg.d / 2 + this._state.right_leg.d / 2) * SCALE, 1) * feetPercent;
-
-        if (rate < 0.15)
-            rate = 0
-        
-        if (rate > 1.5)
-            rate = 1.5
-
         this._source.playbackRate.value = rate
     }
 

@@ -4,8 +4,8 @@ import THREE from 'three'
 const shader = {
     uniforms: {
         tDiffuse: { type: 't', value: null },
-        amount: { type: 'f', value: 0.005 },
-        angle: { type: 'f', value: 0.0 }
+        amount: { type: 'f', value: 0.01 },
+        angle: { type: 'f', value: 0.2 }
     },
     vertexShader: require('./standard.vert'),
     fragmentShader: `
@@ -21,7 +21,7 @@ const shader = {
             vec4 cga = texture2D(tDiffuse, vUv);
             vec4 cb = texture2D(tDiffuse, vUv - offset);
             gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
-        }`,
+        }`
 };
 
 /**
@@ -34,9 +34,5 @@ export default class RgbShift {
 
     getPass() {
         return this._pass
-    }
-
-    update(time) {
-        /* noop */
     }
 }

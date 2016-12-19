@@ -10,6 +10,7 @@ const shader = {
     uniforms: {
         tDiffuse: { type: 't', value: null },
         time: { type: 'f', value: 0 },
+        strength: { type: 'f', value: 1.0 },
         color: { type: 'v4v', value: repeat(new THREE.Vector4(0, 0, 0, 0), ARRAY_SIZE) },
         radius: { type: 'fv', value: repeat(0.5, ARRAY_SIZE) },
         softness: { type: 'fv', value: repeat(0.5, ARRAY_SIZE) },
@@ -17,12 +18,12 @@ const shader = {
         magnitude: { type: 'fv', value: repeat(0.2, ARRAY_SIZE) },
         speed: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
         offset: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
-
     },
     vertexShader: require('./standard.vert'),
     fragmentShader: `
         uniform sampler2D tDiffuse;
         uniform float time;
+        uniform float strength;
 
         uniform vec4 color[${ARRAY_SIZE}];
         uniform float radius[${ARRAY_SIZE}];
@@ -43,7 +44,7 @@ const shader = {
             for (int i = 0; i < ${ARRAY_SIZE}; ++i) {
                 float len = length(position) + sin((angle + (time + offset[i])  * speed[i] ) * waves[i]) * magnitude[i];
                 float weight = 1.0 - smoothstep(radius[i], radius[i] - softness[i], len);
-                tex.rgb = mix(tex.rgb, color[i].rgb, color[i].a * weight);
+                tex.rgb = mix(tex.rgb, color[i].rgb, strength * color[i].a * weight);
             }
             gl_FragColor = vec4(tex.rgb, 1.0);
         }
@@ -70,7 +71,6 @@ export default class VignetteEffect {
             this._pass.uniforms.magnitude.value[i] = vignette.magnitude
             this._pass.uniforms.offset.value[i] = vignette.offset
             this._pass.uniforms.speed.value[i] = vignette.speed
-
             ++i
         }
 
@@ -81,11 +81,15 @@ export default class VignetteEffect {
         this._pass.uniforms.offset.needsUpdate = true
         this._pass.uniforms.magnitude.needsUpdate = true
         this._pass.uniforms.speed.needsUpdate = true
-
     }
 
     update(time) {
-        this._pass.uniforms.time.value = time / 1000
+        this._pass.uniforms.time.value = time
         this._pass.uniforms.time.needsUpdate = true
+    }
+
+    setStrength(value) {
+        this._pass.uniforms.strength.value = value
+        this._pass.uniforms.strength.needsUpdate = true
     }
 }

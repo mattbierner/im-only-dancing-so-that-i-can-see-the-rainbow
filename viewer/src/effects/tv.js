@@ -153,7 +153,7 @@ export default class TvEffect {
     }
 
     update(time) {
-        this._pass.uniforms.time.value = time / 1000
+        this._pass.uniforms.time.value = time
         this._pass.uniforms.time.needsUpdate = true
     }
 

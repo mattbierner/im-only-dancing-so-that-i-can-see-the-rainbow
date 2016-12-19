@@ -50,6 +50,11 @@ export default class Accumulator {
         return this._target.texture
     }
 
+    setStrengths(weights){
+        this._inputPass.uniforms.weights.value = weights
+        this._inputPass.uniforms.weights.needsUpdate = true
+    }
+
     preRender() {
         const step = 3
         const index = Math.floor(this._i / step) % this._passes

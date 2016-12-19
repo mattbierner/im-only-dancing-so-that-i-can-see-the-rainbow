@@ -1,6 +1,5 @@
 import THREE from 'three'
-import Cmyk from './effects/cmyk'
-import Rgb from './experiences/rainbow'
+import Experiance from './experiences/eighties_workout'
 
 import CopyShader from 'imports?THREE=three!three/examples/js/shaders/CopyShader';
 import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing/EffectComposer'
@@ -8,8 +7,6 @@ import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing
 import TexturePass from 'imports?THREE=three!three/examples/js/postprocessing/TexturePass'
 import RenderPass from 'imports?THREE=three!three/examples/js/postprocessing/RenderPass'
 import ShaderPass from 'imports?THREE=three!three/examples/js/postprocessing/ShaderPass'
-
-const canvas2d = document.getElementById('canvas2d')
 
 const nearestPowerOfTwo = dim => {
     let power = 2
@@ -59,7 +56,7 @@ export default class Renderer {
         this._lastMs = 0
 
         this._scene = new THREE.Scene()
-        this._effect = new Rgb();
+        this._effect = new Experiance();
 
         this._initRenderer(canvas)
         this._initCamera()
@@ -90,15 +87,11 @@ export default class Renderer {
         this._scene.add(this._camera)
     }
 
-    /**
-     * Setup the composer.
-     */
     _initComposer() {
         this._composer = new THREE.EffectComposer(this._renderer);
         const r1 = new THREE.RenderPass(this._scene, this._camera)
         r1.renderToScreen = true;
         this._composer.addPass(r1)
-
     }
 
     _initGeometry() {
@@ -141,15 +134,12 @@ export default class Renderer {
 
         // Update image
         this._effect.update(start, delta)
-
         this.leftEye.update(start, delta)
-        if (this.rightEye !== this.leftEye) {
+        if (this.rightEye !== this.leftEye)
              this.rightEye.update(startMs)
-        }
 
         this._leftMaterial.needsUpdate = true
         this._rightMaterial.needsUpdate = true
-
 
         this._render()
     }

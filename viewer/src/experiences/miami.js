@@ -18,19 +18,19 @@ export default class Miami {
         this._lut = new LutEffect('./resources/luts/neon.png')
 
         this._jitter = new BlurEffect([
-            { strength: 1.0, speed: 0.00, amplitude: 0.00, sample: 0.000, offset: 0 },
-            { strength: 1.0, speed: 0.01, amplitude: 0.025, sample: 0.002, offset: 0 },
-            { strength: 1.0, speed: 0.05, amplitude: 0.025, sample: 0.002, offset: 1021 },
-            { strength: 1.0, speed: 0.05, amplitude: 0.025, sample: 0.002, offset: 1709 },
-            { strength: 1.0, speed: 0.1, amplitude: 0.025, sample: 0.005, offset: 709 },
-            { strength: 1.0, speed: 0.1, amplitude: 0.025, sample: 0.005, offset: 2137 }
+            { strength: 1.0, speed: 0, amplitude: 0.00, sample: 0.000, offset: 0 },
+            { strength: 1.0, speed: 10, amplitude: 0.025, sample: 0.002, offset: 6.0 },
+            { strength: 1.0, speed: 50, amplitude: 0.025, sample: 0.002, offset: 1021 },
+            { strength: 1.0, speed: 50, amplitude: 0.025, sample: 0.002, offset: 1709 },
+            { strength: 1.0, speed: 100, amplitude: 0.025, sample: 0.005, offset: 709 },
+            { strength: 1.0, speed: 100, amplitude: 0.025, sample: 0.005, offset: 2137 }
         ])
 
         this._woozy = new BlurEffect([
-            { strength: 1.0, speed: 0.00, amplitude: 0.00, sample: 0.000, offset: 0 },
-            { strength: 1.0, speed: 0.005, amplitude: 0.15, sample: 0.005, offset: 0 },
-            { strength: 1.0, speed: 0.005, amplitude: 0.15, sample: 0.005, offset: 773 },
-            { strength: 1.0, speed: 0.005, amplitude: 0.15, sample: 0.005, offset: 1709 },
+            { strength: 1.0, speed: 0, amplitude: 0.00, sample: 0.000, offset: 0 },
+            { strength: 1.0, speed: 0.5, amplitude: 0.15, sample: 0.005, offset: 0 },
+            { strength: 1.0, speed: 0.5, amplitude: 0.15, sample: 0.005, offset: 773 },
+            { strength: 1.0, speed: 0.5, amplitude: 0.15, sample: 0.005, offset: 1709 },
         ])
 
         this._bloom = new BloomEffect(0.2)
@@ -50,7 +50,7 @@ export default class Miami {
             this._vingette
         ]
 
-        this._sound = new Mp3Player('./resources/rush_rush.mp3')
+        this._sound = new Mp3Player('./resources/music/rush_rush.mp3')
         this._sound.play()
     }
 
@@ -59,7 +59,8 @@ export default class Miami {
     }
 
     forComposer(renderer, map) {
-        return new Accumulator(this, renderer, map)
+        this._acc = new Accumulator(this, renderer, map);
+        return this._acc
     }
 
     push(data) {
@@ -68,11 +69,25 @@ export default class Miami {
 
     update(time, delta) {
         const d = this.getGrowthRate(delta)
-        console.log(this._rate, this._rate + d, d)
+        //   console.log(this._rate, this._rate + d, d)
         this._rate += d
         this._rate = Math.min(1.0, Math.max(0.0, this._rate));
-        this._bloom.setStrength(0.3 + (Math.sin(time / 1000 * 5) / 2 + Math.sin((time + 709) / 1000 * 5) / 2) * 0.15)
+
+        this._bloom.setStrength(0.3 + (Math.sin(time * 5) / 2 + Math.sin((time + 709) * 5) / 2) * 0.15)
         this._lut.setStrength(this._rate)
+        this._vingette.setStrength(this._rate)
+        this._woozy.setStrength(this._rate)
+        this._jitter.setStrength(this._rate)
+        this._acc.setStrengths([1.0, 0, 0, 0, 0, 0])
+
+        if (this._rate > 0.9) {
+            this._acc.setStrengths([0.4, 0.2, 0.2, 0.2, .1, .1])
+        } else if (this._rate > 0.6) {
+            this._acc.setStrengths([0.6, 0.3, 0.1, .1, 0, 0])
+
+        } else if (this._rate > 0.3) {
+            this._acc.setStrengths([0.75, 0.2, 0.05, 0, 0, 0])
+        }
 
         this._effects.forEach(p => p.update && p.update(time))
     }
@@ -81,21 +96,21 @@ export default class Miami {
         let gravity = 0
         let growthMax = 0
         if (this._rate > 0.8) {
-            gravity = 0.19
-            growthMax = 0.20
-        } else if (this._rate > 0.5) {
             gravity = 0.1
-            growthMax = 0.20
-        } else {
+            growthMax = 0.11
+        } else if (this._rate > 0.5) {
             gravity = 0.05
-            growthMax = 0.20
+            growthMax = 0.10
+        } else {
+            gravity = 0.03
+            growthMax = 0.10
         }
         gravity *= delta
         growthMax *= delta
 
         const handsPercent = 0.75
         const feetPercent = 0.25
-        const SCALE = 15
+        const SCALE = 10
 
         let d = Math.min(this._collector.right_hand.delta.length() * SCALE, 1) * handsPercent / 2
             + Math.min(this._collector.left_hand.delta.length() * SCALE, 1) * handsPercent / 2

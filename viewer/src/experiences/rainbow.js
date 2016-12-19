@@ -3,12 +3,12 @@ import BaseExperinace from './_base_experiance'
 import RgbEffect from '../effects/rgb'
 import Collector from '../collector'
 
-const decay = 0.99
+const decay = 0.975
 
 /**
  * RGB movement.
  * 
- * World starts in grayscale and then fadse
+ * World starts in grayscale with movement controlling individual rgb color channels
  */
 export default class Rainbow extends BaseExperinace {
     constructor() {
@@ -27,9 +27,10 @@ export default class Rainbow extends BaseExperinace {
     }
 
     update(time) {
-        const x = this._state.right_hand.d * 2
-        const y = this._state.left_hand.d * 2
-        const z = (this._state.right_leg.d + this._state.left_leg.d) / 2 * 2
+        const mul = 4;
+        const x = this._state.right_hand.d * mul
+        const y = this._state.left_hand.d * mul
+        const z = (this._state.right_leg.d + this._state.left_leg.d) / 2 * mul * 2
         
         this._rgb.setWeights(new THREE.Vector3(x, y, z))
     }

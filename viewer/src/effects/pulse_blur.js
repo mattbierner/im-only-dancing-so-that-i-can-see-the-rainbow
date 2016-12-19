@@ -7,6 +7,8 @@ const shader = {
     uniforms: {
         tDiffuse: { type: 'tDiffuse', value: null },
         time: { type: 'f', value: 0 },
+        totalStrength: { type: 'f', value: 1.0 },
+
         strength: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
         offset: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
         sample: { type: 'fv', value: repeat(0, ARRAY_SIZE) },
@@ -18,6 +20,8 @@ const shader = {
     fragmentShader: `
         uniform sampler2D tDiffuse;
         uniform float time;
+        uniform float totalStrength;
+
         uniform float strength[${ARRAY_SIZE}];
         uniform float offset[${ARRAY_SIZE}];
         uniform float sample[${ARRAY_SIZE}];
@@ -34,11 +38,11 @@ const shader = {
                 vec2 uv = vUv;
                 vec2 center = vec2(0.5, 0.5);
                 uv -= center;
-                uv *= 1.0 - (sin((time + offset[i]) * speed[i]) * amplitude[i] + amplitude[i]) * 0.5;
+                uv *= 1.0 - (totalStrength * (sin((time + offset[i]) * speed[i]) * amplitude[i] + amplitude[i])) * 0.5;
                 uv += center;
 
-                main.rgb += texture2D(tDiffuse, uv + sample[i]).rgb * strength[i] * sampleWeight;
-                main.rgb += texture2D(tDiffuse, uv - sample[i]).rgb * strength[i] * sampleWeight;
+                main.rgb += texture2D(tDiffuse, uv + totalStrength * sample[i]).rgb * strength[i] * sampleWeight;
+                main.rgb += texture2D(tDiffuse, uv - totalStrength * sample[i]).rgb * strength[i] * sampleWeight;
             }
 
             gl_FragColor = main;
@@ -76,7 +80,6 @@ export default class PulseEffect {
         this._pass.uniforms.amplitude.needsUpdate = true
         this._pass.uniforms.sample.needsUpdate = true
 
-
         this._pass.uniforms.count.value = blurs.length
         this._pass.uniforms.count.needsUpdate = true
     }
@@ -84,5 +87,10 @@ export default class PulseEffect {
     update(time) {
         this._pass.uniforms.time.value = time
         this._pass.uniforms.time.needsUpdate = true
+    }
+
+    setStrength(value) {
+        this._pass.uniforms.totalStrength.value = value
+        this._pass.uniforms.totalStrength.needsUpdate = true
     }
 }
