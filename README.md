@@ -1,7 +1,7 @@
-This repo contains the source code used in [my project using a dancing to modify my vision][post]. Check out the post more details on the experiment
+This repo contains the source code used in [my project using dancing to modify my vision][post]. Check out the post more details on the experiment
 
 ## Sensor
-This Python script collects heartbeat data from 4 [Lilypad analog accelerometers][lilypad], sending events over a websocket to the VR headset. It targets a Raspberry Pi that is using a MCP3008 analog to digital converter for the Pulse Sensor.
+This Python script collects movement data from 4 [Lilypad analog accelerometers][lilypad], sending events over a websocket to the VR headset. It targets a Raspberry Pi that is using a MCP3008 analog to digital converter for the Pulse Sensor.
 
 The code requires Python 3.5+, and the [RPi.GPIO](https://github.com/adafruit/Adafruit_Python_GPIO), [MCP3008](https://github.com/adafruit/Adafruit_Python_MCP3008), and [webksockets](https://pypi.python.org/pypi/websockets) libraries.
 
@@ -14,7 +14,7 @@ $ python3 sensor/collector.py eth0
 The script arguments specify which network devices to serve the websocket on.
 
 
-## Site
+## Viewer
 The website is designed to be run on an iPhone used with Google Cardboard. It takes the mjpeg stream from the camera and the heartbeat events, and uses WebGL to modify your vision in realtime.
 
 The site uses webpack. To run it:
