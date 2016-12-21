@@ -103,9 +103,9 @@
 
 	var _three2 = _interopRequireDefault(_three);
 
-	var _eighties_workout = __webpack_require__(3);
+	var _rainbow = __webpack_require__(24);
 
-	var _eighties_workout2 = _interopRequireDefault(_eighties_workout);
+	var _rainbow2 = _interopRequireDefault(_rainbow);
 
 	var _CopyShader = __webpack_require__(4);
 
@@ -115,17 +115,9 @@
 
 	var _EffectComposer2 = _interopRequireDefault(_EffectComposer);
 
-	var _TexturePass = __webpack_require__(6);
-
-	var _TexturePass2 = _interopRequireDefault(_TexturePass);
-
 	var _RenderPass = __webpack_require__(7);
 
 	var _RenderPass2 = _interopRequireDefault(_RenderPass);
-
-	var _ShaderPass = __webpack_require__(8);
-
-	var _ShaderPass2 = _interopRequireDefault(_ShaderPass);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -198,7 +190,7 @@
 	        this._lastMs = 0;
 
 	        this._scene = new _three2.default.Scene();
-	        this._effect = new _eighties_workout2.default();
+	        this._effect = new _rainbow2.default();
 
 	        this._initRenderer(canvas);
 	        this._initCamera();
@@ -3600,129 +3592,7 @@
 	var numFrames=this.geometry.morphTargets.length;var name="__default";var startFrame=0;var endFrame=numFrames-1;var fps=numFrames/1;this.createAnimation(name,startFrame,endFrame,fps);this.setAnimationWeight(name,1);};THREE.MorphBlendMesh.prototype=Object.create(THREE.Mesh.prototype);THREE.MorphBlendMesh.prototype.constructor=THREE.MorphBlendMesh;THREE.MorphBlendMesh.prototype.createAnimation=function(name,start,end,fps){var animation={start:start,end:end,length:end-start+1,fps:fps,duration:(end-start)/fps,lastFrame:0,currentFrame:0,active:false,time:0,direction:1,weight:1,directionBackwards:false,mirroredLoop:false};this.animationsMap[name]=animation;this.animationsList.push(animation);};THREE.MorphBlendMesh.prototype.autoCreateAnimations=function(fps){var pattern=/([a-z]+)_?(\d+)/i;var firstAnimation,frameRanges={};var geometry=this.geometry;for(var i=0,il=geometry.morphTargets.length;i<il;i++){var morph=geometry.morphTargets[i];var chunks=morph.name.match(pattern);if(chunks&&chunks.length>1){var name=chunks[1];if(!frameRanges[name])frameRanges[name]={start:Infinity,end:-Infinity};var range=frameRanges[name];if(i<range.start)range.start=i;if(i>range.end)range.end=i;if(!firstAnimation)firstAnimation=name;}}for(var name in frameRanges){var range=frameRanges[name];this.createAnimation(name,range.start,range.end,fps);}this.firstAnimation=firstAnimation;};THREE.MorphBlendMesh.prototype.setAnimationDirectionForward=function(name){var animation=this.animationsMap[name];if(animation){animation.direction=1;animation.directionBackwards=false;}};THREE.MorphBlendMesh.prototype.setAnimationDirectionBackward=function(name){var animation=this.animationsMap[name];if(animation){animation.direction=-1;animation.directionBackwards=true;}};THREE.MorphBlendMesh.prototype.setAnimationFPS=function(name,fps){var animation=this.animationsMap[name];if(animation){animation.fps=fps;animation.duration=(animation.end-animation.start)/animation.fps;}};THREE.MorphBlendMesh.prototype.setAnimationDuration=function(name,duration){var animation=this.animationsMap[name];if(animation){animation.duration=duration;animation.fps=(animation.end-animation.start)/animation.duration;}};THREE.MorphBlendMesh.prototype.setAnimationWeight=function(name,weight){var animation=this.animationsMap[name];if(animation){animation.weight=weight;}};THREE.MorphBlendMesh.prototype.setAnimationTime=function(name,time){var animation=this.animationsMap[name];if(animation){animation.time=time;}};THREE.MorphBlendMesh.prototype.getAnimationTime=function(name){var time=0;var animation=this.animationsMap[name];if(animation){time=animation.time;}return time;};THREE.MorphBlendMesh.prototype.getAnimationDuration=function(name){var duration=-1;var animation=this.animationsMap[name];if(animation){duration=animation.duration;}return duration;};THREE.MorphBlendMesh.prototype.playAnimation=function(name){var animation=this.animationsMap[name];if(animation){animation.time=0;animation.active=true;}else{console.warn("THREE.MorphBlendMesh: animation["+name+"] undefined in .playAnimation()");}};THREE.MorphBlendMesh.prototype.stopAnimation=function(name){var animation=this.animationsMap[name];if(animation){animation.active=false;}};THREE.MorphBlendMesh.prototype.update=function(delta){for(var i=0,il=this.animationsList.length;i<il;i++){var animation=this.animationsList[i];if(!animation.active)continue;var frameTime=animation.duration/animation.length;animation.time+=animation.direction*delta;if(animation.mirroredLoop){if(animation.time>animation.duration||animation.time<0){animation.direction*=-1;if(animation.time>animation.duration){animation.time=animation.duration;animation.directionBackwards=true;}if(animation.time<0){animation.time=0;animation.directionBackwards=false;}}}else{animation.time=animation.time%animation.duration;if(animation.time<0)animation.time+=animation.duration;}var keyframe=animation.start+THREE.Math.clamp(Math.floor(animation.time/frameTime),0,animation.length-1);var weight=animation.weight;if(keyframe!==animation.currentFrame){this.morphTargetInfluences[animation.lastFrame]=0;this.morphTargetInfluences[animation.currentFrame]=1*weight;this.morphTargetInfluences[keyframe]=0;animation.lastFrame=animation.currentFrame;animation.currentFrame=keyframe;}var mix=animation.time%frameTime/frameTime;if(animation.directionBackwards)mix=1-mix;if(animation.currentFrame!==animation.lastFrame){this.morphTargetInfluences[animation.currentFrame]=mix*weight;this.morphTargetInfluences[animation.lastFrame]=(1-mix)*weight;}else{this.morphTargetInfluences[animation.currentFrame]=weight;}}};
 
 /***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _three = __webpack_require__(2);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	var _base_experiance = __webpack_require__(12);
-
-	var _base_experiance2 = _interopRequireDefault(_base_experiance);
-
-	var _blur = __webpack_require__(13);
-
-	var _blur2 = _interopRequireDefault(_blur);
-
-	var _lut = __webpack_require__(15);
-
-	var _lut2 = _interopRequireDefault(_lut);
-
-	var _rgb_shift = __webpack_require__(17);
-
-	var _rgb_shift2 = _interopRequireDefault(_rgb_shift);
-
-	var _tv = __webpack_require__(18);
-
-	var _tv2 = _interopRequireDefault(_tv);
-
-	var _film = __webpack_require__(23);
-
-	var _film2 = _interopRequireDefault(_film);
-
-	var _collector = __webpack_require__(19);
-
-	var _collector2 = _interopRequireDefault(_collector);
-
-	var _mp = __webpack_require__(20);
-
-	var _mp2 = _interopRequireDefault(_mp);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * 80s workout video
-	 */
-
-	var EightiesWorkout = function (_BaseExperinace) {
-	    _inherits(EightiesWorkout, _BaseExperinace);
-
-	    function EightiesWorkout() {
-	        _classCallCheck(this, EightiesWorkout);
-
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(EightiesWorkout).call(this));
-
-	        _this._state = new _collector2.default(0.98);
-
-	        _this._lut = new _lut2.default('./resources/luts/vintage2.png');
-	        _this._blur = new _blur2.default();
-	        _this._tv = new _tv2.default();
-	        _this._rgbShift = new _rgb_shift2.default();
-	        _this._film = new _film2.default();
-	        _this._effects = [_this._lut, _this._rgbShift, _this._tv, _this._film, _this._blur];
-
-	        _this._sound = new _mp2.default('./resources/music/maniac.mp3');
-	        _this._sound.setPlaybackRate(0);
-	        _this._sound.play();
-	        return _this;
-	    }
-
-	    _createClass(EightiesWorkout, [{
-	        key: 'push',
-	        value: function push(data) {
-	            this._state.push(data);
-
-	            this._sound.setPlaybackRate(this._getPlaybackRate());
-	        }
-	    }, {
-	        key: 'update',
-	        value: function update(time) {
-	            var r = this._getPlaybackRate();
-	            this._tv.setDistortion(3 * r, 5 * r);
-	            this._lut.setStrength(r / 1.5);
-	            this._effects.forEach(function (p) {
-	                return p.update && p.update(time);
-	            });
-	        }
-	    }, {
-	        key: '_getPlaybackRate',
-	        value: function _getPlaybackRate() {
-	            var SCALE = 1.5;
-
-	            var handsPercent = 0.7;
-	            var feetPercent = 0.3;
-
-	            var rate = Math.min(this._state.right_hand.d * SCALE, 1) * handsPercent / 2 + Math.min(this._state.left_hand.d * SCALE, 1) * handsPercent / 2 + Math.min((this._state.left_leg.d / 2 + this._state.right_leg.d / 2) * SCALE, 1) * feetPercent;
-
-	            if (rate < 0.05) rate = 0;
-
-	            if (rate > 1.5) rate = 1.5;
-
-	            return rate;
-	        }
-	    }]);
-
-	    return EightiesWorkout;
-	}(_base_experiance2.default);
-
-	exports.default = EightiesWorkout;
-
-/***/ },
+/* 3 */,
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3922,63 +3792,7 @@
 
 
 /***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*** IMPORTS FROM imports-loader ***/
-	var THREE = __webpack_require__(2);
-
-	"use strict";
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	THREE.TexturePass = function (texture, opacity) {
-
-		THREE.Pass.call(this);
-
-		if (THREE.CopyShader === undefined) console.error("THREE.TexturePass relies on THREE.CopyShader");
-
-		var shader = THREE.CopyShader;
-
-		this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-
-		this.uniforms["opacity"].value = opacity !== undefined ? opacity : 1.0;
-		this.uniforms["tDiffuse"].value = texture;
-
-		this.material = new THREE.ShaderMaterial({
-
-			uniforms: this.uniforms,
-			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
-
-		});
-
-		this.needsSwap = false;
-
-		this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-		this.scene = new THREE.Scene();
-
-		this.quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), null);
-		this.scene.add(this.quad);
-	};
-
-	THREE.TexturePass.prototype = Object.assign(Object.create(THREE.Pass.prototype), {
-
-		constructor: THREE.TexturePass,
-
-		render: function render(renderer, writeBuffer, readBuffer, delta, maskActive) {
-
-			this.quad.material = this.material;
-
-			renderer.render(this.scene, this.camera, readBuffer, this.clear);
-		}
-
-	});
-
-
-/***/ },
+/* 6 */,
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4039,76 +3853,7 @@
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*** IMPORTS FROM imports-loader ***/
-	var THREE = __webpack_require__(2);
-
-	"use strict";
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
-	THREE.ShaderPass = function (shader, textureID) {
-
-		THREE.Pass.call(this);
-
-		this.textureID = textureID !== undefined ? textureID : "tDiffuse";
-
-		if (shader instanceof THREE.ShaderMaterial) {
-
-			this.uniforms = shader.uniforms;
-
-			this.material = shader;
-		} else if (shader) {
-
-			this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-
-			this.material = new THREE.ShaderMaterial({
-
-				defines: shader.defines || {},
-				uniforms: this.uniforms,
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-
-			});
-		}
-
-		this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-		this.scene = new THREE.Scene();
-
-		this.quad = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), null);
-		this.scene.add(this.quad);
-	};
-
-	THREE.ShaderPass.prototype = Object.assign(Object.create(THREE.Pass.prototype), {
-
-		constructor: THREE.ShaderPass,
-
-		render: function render(renderer, writeBuffer, readBuffer, delta, maskActive) {
-
-			if (this.uniforms[this.textureID]) {
-
-				this.uniforms[this.textureID].value = readBuffer.texture;
-			}
-
-			this.quad.material = this.material;
-
-			if (this.renderToScreen) {
-
-				renderer.render(this.scene, this.camera);
-			} else {
-
-				renderer.render(this.scene, this.camera, writeBuffer, this.clear);
-			}
-		}
-
-	});
-
-
-/***/ },
+/* 8 */,
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4291,342 +4036,17 @@
 	exports.default = SimpleComposer;
 
 /***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _three = __webpack_require__(2);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var shader = {
-	    uniforms: {
-	        tDiffuse: { type: 't', value: null },
-	        strength: { type: 'f', value: 0.001 }
-	    },
-	    vertexShader: __webpack_require__(14),
-	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float strength;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 main = texture2D(tDiffuse, vUv);\n\n            main.rgb += texture2D(tDiffuse, vUv + strength * 1.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 2.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 3.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 4.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv + strength * 5.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 1.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 2.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 3.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 4.0).rgb;\n            main.rgb += texture2D(tDiffuse, vUv - strength * 5.0).rgb;\n\n            main.rgb /= 10.0;\n\n            gl_FragColor = main;\n        }\n    '
-	};
-
-	/**
-	 * Multisample blur
-	 */
-
-	var BlurEffect = function () {
-	    function BlurEffect() {
-	        _classCallCheck(this, BlurEffect);
-
-	        this._pass = new _three2.default.ShaderPass(shader);
-	    }
-
-	    _createClass(BlurEffect, [{
-	        key: 'getPass',
-	        value: function getPass() {
-	            return this._pass;
-	        }
-	    }, {
-	        key: 'setStrength',
-	        value: function setStrength(value) {
-	            this._pass.uniforms.strength.value = value;
-	            this._pass.uniforms.strength.needsUpdate = true;
-	        }
-	    }, {
-	        key: 'update',
-	        value: function update(time) {
-	            /* noop */
-	        }
-	    }]);
-
-	    return BlurEffect;
-	}();
-
-	exports.default = BlurEffect;
-
-/***/ },
+/* 13 */,
 /* 14 */
 /***/ function(module, exports) {
 
 	module.exports = "#define GLSLIFY 1\nvarying vec2 vUv;\n\nvoid main() {\n    vUv = uv;\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n}"
 
 /***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _three = __webpack_require__(2);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var shader = {
-	    uniforms: {
-	        tDiffuse: { type: 't', value: null },
-	        table: { type: 't', value: null },
-	        strength: { type: 'f', value: 1.0 }
-	    },
-	    vertexShader: __webpack_require__(14),
-	    fragmentShader: __webpack_require__(16)
-	};
-
-	/**
-	 * Lookup table.
-	 */
-
-	var Lut = function () {
-	    function Lut(tablePath) {
-	        var _this = this;
-
-	        var strength = arguments.length <= 1 || arguments[1] === undefined ? 1.0 : arguments[1];
-
-	        _classCallCheck(this, Lut);
-
-	        this.pass = new _three2.default.ShaderPass(shader);
-	        new _three2.default.TextureLoader().load(tablePath, function (tex) {
-	            tex.minFilter = tex.magFilter = _three2.default.NearestFilter;
-	            tex.needsUpdate = true;
-	            _this.pass.uniforms.table.value = tex;
-	            _this.pass.uniforms.table.needsUpdate = true;
-	        });
-
-	        this.setStrength(strength);
-	    }
-
-	    _createClass(Lut, [{
-	        key: 'getPass',
-	        value: function getPass() {
-	            return this.pass;
-	        }
-	    }, {
-	        key: 'setStrength',
-	        value: function setStrength(value) {
-	            this.pass.uniforms.strength.value = value;
-	            this.pass.uniforms.strength.needsUpdate = true;
-	        }
-	    }]);
-
-	    return Lut;
-	}();
-
-	exports.default = Lut;
-
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	module.exports = "#define GLSLIFY 1\n#define LUT_FLIP_Y 1\nvec4 lookup_1_0(in vec4 textureColor, in sampler2D lookupTable) {\n    #ifndef LUT_NO_CLAMP\n        textureColor = clamp(textureColor, 0.0, 1.0);\n    #endif\n\n    mediump float blueColor = textureColor.b * 63.0;\n\n    mediump vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n\n    mediump vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n\n    highp vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos1.y = 1.0-texPos1.y;\n    #endif\n\n    highp vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos2.y = 1.0-texPos2.y;\n    #endif\n\n    lowp vec4 newColor1 = texture2D(lookupTable, texPos1);\n    lowp vec4 newColor2 = texture2D(lookupTable, texPos2);\n\n    lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor;\n}\n\n\n\nuniform sampler2D tDiffuse;\nuniform sampler2D table;\n\nuniform float strength;\n\nvarying vec2 vUv;\n\nvoid main() {\n    vec4 tex = texture2D(tDiffuse, vUv);\n    gl_FragColor = mix(tex, lookup_1_0(tex, table), clamp(strength, 0.0, 1.0));\n}\n"
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _three = __webpack_require__(2);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	// From felixturner / http://airtight.cc/
-	var shader = {
-	    uniforms: {
-	        tDiffuse: { type: 't', value: null },
-	        amount: { type: 'f', value: 0.01 },
-	        angle: { type: 'f', value: 0.2 }
-	    },
-	    vertexShader: __webpack_require__(14),
-	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform float amount;\n        uniform float angle;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec2 offset = amount * vec2( cos(angle), sin(angle));\n            vec4 cr = texture2D(tDiffuse, vUv + offset);\n            vec4 cga = texture2D(tDiffuse, vUv);\n            vec4 cb = texture2D(tDiffuse, vUv - offset);\n            gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);\n        }'
-	};
-
-	/**
-	 * Rgb Shift Effect
-	 */
-
-	var RgbShift = function () {
-	    function RgbShift(tablePath) {
-	        _classCallCheck(this, RgbShift);
-
-	        this._pass = new _three2.default.ShaderPass(shader);
-	    }
-
-	    _createClass(RgbShift, [{
-	        key: 'getPass',
-	        value: function getPass() {
-	            return this._pass;
-	        }
-	    }]);
-
-	    return RgbShift;
-	}();
-
-	exports.default = RgbShift;
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _three = __webpack_require__(2);
-
-	var _three2 = _interopRequireDefault(_three);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * @author Felix Turner / www.airtight.cc / @felixturner
-	 *
-	 * Bad TV Shader
-	 * Simulates a bad TV via horizontal distortion and vertical roll
-	 * Uses Ashima WebGl Noise: https://github.com/ashima/webgl-noise
-	 *
-	 * Uniforms:
-	 * time: steadily increasing float passed in
-	 * distortion: amount of thick distortion
-	 * distortion2: amount of fine grain distortion
-	 * speed: distortion vertical travel speed
-	 * rollSpeed: vertical roll speed
-	 * 
-	 * The MIT License
-	 * 
-	 * Copyright (c) Felix Turner
-	 * 
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 * 
-	 * The above copyright notice and this permission notice shall be included in
-	 * all copies or substantial portions of the Software.
-	 * 
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	 * THE SOFTWARE.
-	 * 
-	 */
-
-	var BadTVShader = {
-	    uniforms: {
-	        "tDiffuse": { type: "t", value: null },
-	        "time": { type: "f", value: 0.0 },
-	        "distortion": { type: "f", value: 3.0 },
-	        "distortion2": { type: "f", value: 5.0 },
-	        "speed": { type: "f", value: 0.2 },
-	        "rollSpeed": { type: "f", value: 0.1 }
-	    },
-
-	    vertexShader: __webpack_require__(14),
-
-	    fragmentShader: ["uniform sampler2D tDiffuse;", "uniform float time;", "uniform float distortion;", "uniform float distortion2;", "uniform float speed;", "uniform float rollSpeed;", "varying vec2 vUv;",
-
-	    // Start Ashima 2D Simplex Noise
-
-	    "vec3 mod289(vec3 x) {", "  return x - floor(x * (1.0 / 289.0)) * 289.0;", "}", "vec2 mod289(vec2 x) {", "  return x - floor(x * (1.0 / 289.0)) * 289.0;", "}", "vec3 permute(vec3 x) {", "  return mod289(((x*34.0)+1.0)*x);", "}", "float snoise(vec2 v)", "  {", "  const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0", "                      0.366025403784439,  // 0.5*(sqrt(3.0)-1.0)", "                     -0.577350269189626,  // -1.0 + 2.0 * C.x", "                      0.024390243902439); // 1.0 / 41.0", "  vec2 i  = floor(v + dot(v, C.yy) );", "  vec2 x0 = v -   i + dot(i, C.xx);", "  vec2 i1;", "  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);", "  vec4 x12 = x0.xyxy + C.xxzz;", " x12.xy -= i1;", "  i = mod289(i); // Avoid truncation effects in permutation", "  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))", "		+ i.x + vec3(0.0, i1.x, 1.0 ));", "  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);", "  m = m*m ;", "  m = m*m ;", "  vec3 x = 2.0 * fract(p * C.www) - 1.0;", "  vec3 h = abs(x) - 0.5;", "  vec3 ox = floor(x + 0.5);", "  vec3 a0 = x - ox;", "  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );", "  vec3 g;", "  g.x  = a0.x  * x0.x  + h.x  * x0.y;", "  g.yz = a0.yz * x12.xz + h.yz * x12.yw;", "  return 130.0 * dot(m, g);", "}",
-
-	    // End Ashima 2D Simplex Noise
-
-	    "void main() {", "vec2 p = vUv;", "float ty = time*speed;", "float yt = p.y - ty;",
-	    //smooth distortion
-	    "float offset = snoise(vec2(yt*3.0,0.0))*0.2;",
-	    // boost distortion
-	    "offset = offset*distortion * offset*distortion * offset;",
-	    //add fine grain distortion
-	    "offset += snoise(vec2(yt*50.0,0.0))*distortion2*0.001;",
-	    //combine distortion on X with roll on Y
-	    "gl_FragColor = texture2D(tDiffuse,  vec2(fract(p.x + offset),fract(p.y-time*rollSpeed) ));", "}"].join("\n")
-
-	};
-
-	var TvEffect = function () {
-	    function TvEffect() {
-	        _classCallCheck(this, TvEffect);
-
-	        var shader = BadTVShader;
-	        shader.uniforms.rollSpeed.value = 0;
-	        shader.uniforms.rollSpeed.needsUpdate = true;
-
-	        shader.uniforms.speed.value = 0.2;
-	        shader.uniforms.speed.needsUpdate = true;
-
-	        shader.uniforms.distortion.value = 3;
-	        shader.uniforms.distortion.needsUpdate = true;
-	        shader.uniforms.distortion2.value = 5;
-	        shader.uniforms.distortion2.needsUpdate = true;
-
-	        this._pass = new _three2.default.ShaderPass(shader);
-	    }
-
-	    _createClass(TvEffect, [{
-	        key: "getPass",
-	        value: function getPass(composer) {
-	            return this._pass;
-	        }
-	    }, {
-	        key: "update",
-	        value: function update(time) {
-	            this._pass.uniforms.time.value = time;
-	            this._pass.uniforms.time.needsUpdate = true;
-	        }
-	    }, {
-	        key: "setDistortion",
-	        value: function setDistortion(one, two) {
-	            this._pass.uniforms.distortion.value = one;
-	            this._pass.uniforms.distortion.needsUpdate = true;
-
-	            this._pass.uniforms.distortion2.value = two;
-	            this._pass.uniforms.distortion2.needsUpdate = true;
-	        }
-	    }]);
-
-	    return TvEffect;
-	}();
-
-	exports.default = TvEffect;
-
-/***/ },
+/* 15 */,
+/* 16 */,
+/* 17 */,
+/* 18 */,
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4750,7 +4170,11 @@
 	exports.default = Collector;
 
 /***/ },
-/* 20 */
+/* 20 */,
+/* 21 */,
+/* 22 */,
+/* 23 */,
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4761,313 +4185,83 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _audio_context = __webpack_require__(21);
+	var _three = __webpack_require__(2);
 
-	var _audio_context2 = _interopRequireDefault(_audio_context);
+	var _three2 = _interopRequireDefault(_three);
+
+	var _base_experiance = __webpack_require__(12);
+
+	var _base_experiance2 = _interopRequireDefault(_base_experiance);
+
+	var _rgb = __webpack_require__(25);
+
+	var _rgb2 = _interopRequireDefault(_rgb);
+
+	var _collector = __webpack_require__(19);
+
+	var _collector2 = _interopRequireDefault(_collector);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var decay = 0.975;
+
 	/**
+	 * RGB movement.
+	 * 
+	 * World starts in grayscale with movement controlling individual rgb color channels
 	 */
 
-	var Mp3Sound = function () {
-	    function Mp3Sound(audioFile) {
-	        var _this = this;
+	var Rainbow = function (_BaseExperinace) {
+	    _inherits(Rainbow, _BaseExperinace);
 
-	        _classCallCheck(this, Mp3Sound);
+	    function Rainbow() {
+	        _classCallCheck(this, Rainbow);
 
-	        this._playing = false;
-	        this._playbackRate = 1;
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Rainbow).call(this));
 
-	        var req = new XMLHttpRequest();
-	        req.open('GET', audioFile, true);
-	        req.responseType = 'arraybuffer';
-	        req.onload = function () {
-	            return _audio_context2.default.then(function (ctx) {
-	                _this._ctx = ctx;
-	                _this._ctx.decodeAudioData(req.response, function (buffer) {
-	                    _this._init(ctx, buffer);
-	                }, console.error);
-	            });
-	        };
-	        req.send();
+	        _this._state = new _collector2.default(decay);
+
+	        _this._rgb = new _rgb2.default(new _three2.default.Vector3());
+	        _this._effects = [_this._rgb];
+	        return _this;
 	    }
 
-	    _createClass(Mp3Sound, [{
-	        key: '_init',
-	        value: function _init(ctx, sound) {
-	            this._gain = ctx.createGain();
-	            this._gain.connect(ctx.destination);
-
-	            this._source = ctx.createBufferSource();
-	            this._source.playbackRate.value = this._playbackRate;
-	            this._source.buffer = sound;
-	            this._source.connect(this._gain);
-
-	            if (this._playing) this._source.start(0);
+	    _createClass(Rainbow, [{
+	        key: 'push',
+	        value: function push(data) {
+	            this._state.push(data);
 	        }
 	    }, {
-	        key: 'setPlaybackRate',
-	        value: function setPlaybackRate(rate) {
-	            this._playbackRate = rate;
-	            if (!this._source) return;
-	            this._source.playbackRate.value = rate;
-	        }
-	    }, {
-	        key: 'play',
-	        value: function play() {
-	            if (this._playing) return;
+	        key: 'update',
+	        value: function update(time) {
+	            var mul = 4;
+	            var x = this._state.right_hand.d * mul;
+	            var y = this._state.left_hand.d * mul;
+	            var z = (this._state.right_leg.d + this._state.left_leg.d) / 2 * mul * 2;
 
-	            this._playing = true;
-	            if (!this._ctx || !this._source) return;
-
-	            this._source.start(0);
+	            this._rgb.setWeights(new _three2.default.Vector3(x, y, z));
 	        }
 	    }]);
 
-	    return Mp3Sound;
-	}();
+	    return Rainbow;
+	}(_base_experiance2.default);
 
-	exports.default = Mp3Sound;
+	exports.default = Rainbow;
 
 /***/ },
-/* 21 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
-	});
-	exports.init = undefined;
-
-	var _reverb = __webpack_require__(22);
-
-	var _reverb2 = _interopRequireDefault(_reverb);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var r = void 0;
-	var ctx = void 0;
-
-	exports.default = new Promise(function (resolve, reject) {
-	    r = resolve;
-	});
-
-	/**
-	 * For IOS, audio context can only be created inside of a touch event.
-	 */
-
-	var init = exports.init = function init() {
-	    if (ctx) return ctx;
-
-	    ctx = new (window.AudioContext || window.webkitAudioContext)();
-	    _reverb2.default.extend(ctx);
-	    var oscillator = ctx.createOscillator();
-	    oscillator.frequency.value = 1;
-	    oscillator.connect(ctx.destination);
-	    oscillator.start(0);
-	    oscillator.stop(0);
-	    r(ctx);
-	    return ctx;
-	};
-
-	var onIos = function onIos() {
-	    return (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-	    );
-	};
-
-	// The audio context must be created inside of a touch event on IOS
-	if (onIos()) {
-	    document.body.addEventListener('touchstart', function () {
-	        return init();
-	    }, false);
-	} else {
-	    init();
-	}
-
-/***/ },
-/* 22 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/*global ArrayBuffer, Uint8Array, window, XMLHttpRequest*/
-	// from https://github.com/burnson/Reverb.js
-	exports.default = {
-	  extend: function extend(audioContext) {
-	    function decodeBase64ToArrayBuffer(input) {
-	      function encodedValue(input, index) {
-	        var encodedCharacter,
-	            x = input.charCodeAt(index);
-	        if (index < input.length) {
-	          if (x >= 65 && x <= 90) {
-	            encodedCharacter = x - 65;
-	          } else if (x >= 97 && x <= 122) {
-	            encodedCharacter = x - 71;
-	          } else if (x >= 48 && x <= 57) {
-	            encodedCharacter = x + 4;
-	          } else if (x === 43) {
-	            encodedCharacter = 62;
-	          } else if (x === 47) {
-	            encodedCharacter = 63;
-	          } else if (x !== 61) {
-	            console.log('base64 encountered unexpected character code: ' + x);
-	          }
-	        }
-	        return encodedCharacter;
-	      }
-
-	      if (input.length === 0 || input.length % 4 > 0) {
-	        console.log('base64 encountered unexpected length: ' + input.length);
-	        return;
-	      }
-
-	      var padding = input.match(/[=]*$/)[0].length,
-	          decodedLength = input.length * 3 / 4 - padding,
-	          buffer = new ArrayBuffer(decodedLength),
-	          bufferView = new Uint8Array(buffer),
-	          encoded = [],
-	          d = 0,
-	          e = 0,
-	          i;
-
-	      while (d < decodedLength) {
-	        for (i = 0; i < 4; i += 1) {
-	          encoded[i] = encodedValue(input, e);
-	          e += 1;
-	        }
-	        bufferView[d] = encoded[0] * 4 + Math.floor(encoded[1] / 16);
-	        d += 1;
-	        if (d < decodedLength) {
-	          bufferView[d] = encoded[1] % 16 * 16 + Math.floor(encoded[2] / 4);
-	          d += 1;
-	        }
-	        if (d < decodedLength) {
-	          bufferView[d] = encoded[2] % 4 * 64 + encoded[3];
-	          d += 1;
-	        }
-	      }
-	      return buffer;
-	    }
-
-	    function decodeAndSetupBuffer(node, arrayBuffer, callback) {
-	      audioContext.decodeAudioData(arrayBuffer, function (audioBuffer) {
-	        console.log('Finished decoding audio data.');
-	        node.buffer = audioBuffer;
-	        if (typeof callback === "function" && audioBuffer !== null) {
-	          callback(node);
-	        }
-	      }, function (e) {
-	        console.log('Could not decode audio data: ' + e);
-	      });
-	    }
-
-	    audioContext.createReverbFromBase64 = function (audioBase64, callback) {
-	      var reverbNode = audioContext.createConvolver();
-	      decodeAndSetupBuffer(reverbNode, decodeBase64ToArrayBuffer(audioBase64), callback);
-	      return reverbNode;
-	    };
-
-	    audioContext.createSourceFromBase64 = function (audioBase64, callback) {
-	      var sourceNode = audioContext.createBufferSource();
-	      decodeAndSetupBuffer(sourceNode, decodeBase64ToArrayBuffer(audioBase64), callback);
-	      return sourceNode;
-	    };
-
-	    audioContext.createReverbFromUrl = function (audioUrl, callback) {
-	      console.log('Downloading impulse response from ' + audioUrl);
-	      var reverbNode = audioContext.createConvolver(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded impulse response');
-	          decodeAndSetupBuffer(reverbNode, request.response, callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.responseType = 'arraybuffer';
-	      request.send();
-	      return reverbNode;
-	    };
-
-	    audioContext.createSourceFromUrl = function (audioUrl, callback) {
-	      console.log('Downloading sound from ' + audioUrl);
-	      var sourceNode = audioContext.createBufferSource(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded sound');
-	          decodeAndSetupBuffer(sourceNode, request.response, callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.responseType = 'arraybuffer';
-	      request.send();
-	      return sourceNode;
-	    };
-
-	    audioContext.createReverbFromBase64Url = function (audioUrl, callback) {
-	      console.log('Downloading base64 impulse response from ' + audioUrl);
-	      var reverbNode = audioContext.createConvolver(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded impulse response');
-	          decodeAndSetupBuffer(reverbNode, decodeBase64ToArrayBuffer(request.response), callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.send();
-	      return reverbNode;
-	    };
-
-	    audioContext.createSourceFromBase64Url = function (audioUrl, callback) {
-	      console.log('Downloading base64 sound from ' + audioUrl);
-	      var sourceNode = audioContext.createBufferSource(),
-	          request = new XMLHttpRequest();
-	      request.open('GET', audioUrl, true);
-	      request.onreadystatechange = function () {
-	        if (request.readyState === 4 && request.status === 200) {
-	          console.log('Downloaded sound');
-	          decodeAndSetupBuffer(sourceNode, decodeBase64ToArrayBuffer(request.response), callback);
-	        }
-	      };
-	      request.onerror = function (e) {
-	        console.log('There was an error receiving the response: ' + e);
-	        reverbjs.networkError = e;
-	      };
-	      request.send();
-	      return sourceNode;
-	    };
-	  }
-	};
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
 	});
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5080,103 +4274,44 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
-	 * Film grain & scanlines shader
-	 *
-	 * - ported from HLSL to WebGL / GLSL
-	 * http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
-	 *
-	 * Screen Space Static Postprocessor
-	 *
-	 * Produces an analogue noise overlay similar to a film grain / TV static
-	 *
-	 * Original implementation and noise algorithm
-	 * Pat 'Hawthorne' Shearon
-	 *
-	 * Optimized scanlines + noise version with intensity scaling
-	 * Georg 'Leviathan' Steinrohder
-	 *
-	 * This version is provided under a Creative Commons Attribution 3.0 License
-	 * http://creativecommons.org/licenses/by/3.0/
-	 */
-
 	var shader = {
-		uniforms: {
-
-			"tDiffuse": { type: "t", value: null },
-			"time": { type: "f", value: 0.0 },
-			"nIntensity": { type: "f", value: 0.5 },
-			"sIntensity": { type: "f", value: 0.05 },
-			"sCount": { type: "f", value: 4096 },
-			"grayscale": { type: "i", value: 0 }
-
-		},
-
-		vertexShader: ["varying vec2 vUv;", "void main() {", "vUv = uv;", "gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );", "}"].join("\n"),
-
-		fragmentShader: [
-
-		// control parameter
-		"uniform float time;", "uniform bool grayscale;",
-
-		// noise effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float nIntensity;",
-
-		// scanlines effect intensity value (0 = no effect, 1 = full effect)
-		"uniform float sIntensity;",
-
-		// scanlines effect count value (0 = no effect, 4096 = full effect)
-		"uniform float sCount;", "uniform sampler2D tDiffuse;", "varying vec2 vUv;", "void main() {",
-
-		// sample the source
-		"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
-
-		// make some noise
-		"float x = vUv.x * vUv.y * time *  1000.0;", "x = mod( x, 13.0 ) * mod( x, 123.0 );", "float dx = mod( x, 0.01 );",
-
-		// add noise
-		"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
-
-		// get us a sine and cosine
-		"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
-
-		// add scanlines
-		"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
-
-		// interpolate between source and result by intensity
-		"cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
-
-		// convert to grayscale if desired
-		"if( grayscale ) {", "cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );", "}", "gl_FragColor =  vec4( cResult, cTextureScreen.a );", "}"].join("\n")
-
+	    uniforms: {
+	        tDiffuse: { type: 't', value: null },
+	        weights: { type: 'v3', value: new _three2.default.Vector3(0, 0, 0) }
+	    },
+	    vertexShader: __webpack_require__(14),
+	    fragmentShader: '\n        uniform sampler2D tDiffuse;\n        uniform vec3 weights;\n\n        varying vec2 vUv;\n\n        void main() {\n            vec4 tex = texture2D(tDiffuse, vUv);\n            vec3 gray = vec3(tex.r * 0.2126 + tex.g * 0.7152 + tex.b * 0.0722);\n            vec3 color = gray + max(tex.rgb - gray, 0.0) * weights;\n            gl_FragColor = vec4(color, 1.0);\n        }\n    '
 	};
 
-	var FilmEffect = function () {
-		function FilmEffect() {
-			_classCallCheck(this, FilmEffect);
+	/**
+	 * Shows world as grayscale with individually controllable rgb channels
+	 */
 
-			this._pass = new _three2.default.ShaderPass(shader);
-		}
+	var RgbEffect = function () {
+	    function RgbEffect(weights) {
+	        _classCallCheck(this, RgbEffect);
 
-		_createClass(FilmEffect, [{
-			key: "getPass",
-			value: function getPass() {
-				return this._pass;
-			}
-		}, {
-			key: "update",
-			value: function update(time) {
-				this._pass.uniforms.time.value = time;
-				this._pass.uniforms.time.needsUpdate = true;
-			}
-		}]);
+	        this._pass = new _three2.default.ShaderPass(shader);
+	        this.setWeights(weights);
+	    }
 
-		return FilmEffect;
+	    _createClass(RgbEffect, [{
+	        key: 'getPass',
+	        value: function getPass() {
+	            return this._pass;
+	        }
+	    }, {
+	        key: 'setWeights',
+	        value: function setWeights(weights) {
+	            this._pass.uniforms.weights.value.copy(weights);
+	            this._pass.uniforms.weights.needsUpdate = true;
+	        }
+	    }]);
+
+	    return RgbEffect;
 	}();
 
-	exports.default = FilmEffect;
+	exports.default = RgbEffect;
 
 /***/ }
 /******/ ]);

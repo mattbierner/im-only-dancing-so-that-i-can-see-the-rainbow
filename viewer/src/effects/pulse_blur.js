@@ -53,7 +53,7 @@ const shader = {
 /**
  * 
  */
-export default class PulseEffect {
+export default class PulseBlurEffect {
     constructor(blurs) {
         this._pass = new THREE.ShaderPass(shader)
 

@@ -118,6 +118,4 @@ export default class FilmEffect {
         this._pass.uniforms.time.value = time
         this._pass.uniforms.time.needsUpdate = true
     }
-
-   
 }

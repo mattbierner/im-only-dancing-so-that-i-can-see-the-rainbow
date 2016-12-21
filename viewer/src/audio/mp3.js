@@ -1,6 +1,7 @@
 import audio_context from './audio_context'
 
 /**
+ * Handles playback of an audio file.
  */
 export default class Mp3Sound {
     constructor(audioFile) {
@@ -32,7 +33,6 @@ export default class Mp3Sound {
         if (this._playing)
             this._source.start(0)
     }
-
 
     setPlaybackRate(rate) {
         this._playbackRate = rate

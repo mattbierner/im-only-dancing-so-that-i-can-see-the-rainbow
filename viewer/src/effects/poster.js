@@ -2,7 +2,7 @@ import THREE from 'three'
 
 const shader = {
     uniforms: {
-        map: { type: 'map', value: new THREE.Texture() }
+        map: { type: 'map', value: null }
     },
     vertexShader: require('./standard.vert'),
     fragmentShader: `
@@ -27,10 +27,5 @@ export default class PosterEffect {
     constructor() {
         this.pass = new THREE.ShaderPass(shader, 'map')
     }
-
-    push(data) {
-    }
-
-    update(clock) {
-    }
+    
 }

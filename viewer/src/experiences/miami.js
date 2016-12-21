@@ -28,9 +28,9 @@ export default class Miami {
 
         this._woozy = new BlurEffect([
             { strength: 1.0, speed: 0, amplitude: 0.00, sample: 0.000, offset: 0 },
-            { strength: 1.0, speed: 0.5, amplitude: 0.15, sample: 0.005, offset: 0 },
-            { strength: 1.0, speed: 0.5, amplitude: 0.15, sample: 0.005, offset: 773 },
-            { strength: 1.0, speed: 0.5, amplitude: 0.15, sample: 0.005, offset: 1709 },
+            { strength: 1.0, speed: 50, amplitude: 0.15, sample: 0.005, offset: 0 },
+            { strength: 1.0, speed: 50, amplitude: 0.15, sample: 0.005, offset: 773 },
+            { strength: 1.0, speed: 50, amplitude: 0.15, sample: 0.005, offset: 1709 },
         ])
 
         this._bloom = new BloomEffect(0.2)
@@ -110,7 +110,7 @@ export default class Miami {
 
         const handsPercent = 0.75
         const feetPercent = 0.25
-        const SCALE = 10
+        const SCALE = 8
 
         let d = Math.min(this._collector.right_hand.delta.length() * SCALE, 1) * handsPercent / 2
             + Math.min(this._collector.left_hand.delta.length() * SCALE, 1) * handsPercent / 2

@@ -1,12 +1,10 @@
 import THREE from 'three'
-import Experiance from './experiences/eighties_workout'
+import Experiance from './experiences/rainbow'
 
 import CopyShader from 'imports?THREE=three!three/examples/js/shaders/CopyShader';
 import EffectComposer from 'imports?THREE=three!three/examples/js/postprocessing/EffectComposer'
 
-import TexturePass from 'imports?THREE=three!three/examples/js/postprocessing/TexturePass'
 import RenderPass from 'imports?THREE=three!three/examples/js/postprocessing/RenderPass'
-import ShaderPass from 'imports?THREE=three!three/examples/js/postprocessing/ShaderPass'
 
 const nearestPowerOfTwo = dim => {
     let power = 2
