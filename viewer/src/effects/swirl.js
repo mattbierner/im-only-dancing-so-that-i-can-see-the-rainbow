@@ -12,8 +12,6 @@ const shader = {
         uniform float time;
 
         varying vec2 vUv;
-        
-
 
         void main() {
             float radius = 0.8;
